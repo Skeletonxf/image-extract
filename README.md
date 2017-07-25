@@ -4,10 +4,9 @@ Pulls images out of the current tab to show you all the images on a page when yo
 
 After:
 
-![After running](../blob/master/screenshots/after.png?raw=true)
+![After running](../master/screenshots/after.png?raw=true)
 
 Before:
 
-![Before running](../blob/master/screenshots/before.png?raw=true)
-
+![Before running](../master/screenshots/before.png?raw=true)
 
