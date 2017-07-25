@@ -1,6 +1,7 @@
 {
   "description": "Pulls images out of the current tab",
   "manifest_version": 2,
+  "homepage_url": "https://github.com/Skeletonxf/image-extract",
   "name": "Image extract",
   "version": "1.0",
 
