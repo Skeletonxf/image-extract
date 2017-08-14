@@ -18,70 +18,129 @@ function run() {
     image.src = old.src
     image.width = old.width
     image.height = old.height
+    // for restoring webpage sizes
+    image.webpageWidth = old.width
+    image.webpageHeight = old.height
+    image.webpageSize = true
     return image
   }
 
-  function toggleCenter() {
+  // runs a consumer on each image
+  function forEachImage(consumer) {
     for (let i = 0; i < images.length; i++) {
-      images[i].classList.toggle("imageExtractCenterStyle")
+      consumer(images[i])
     }
   }
 
-  function center() {
-    for (let i = 0; i < images.length; i++) {
-      images[i].classList.add("imageExtractCenterStyle")
-    }
-  }
-
-  // walk over images
+  // walk over the images and copy them
   for (let i = 0; i < items.length; i++) {
     // copy images in body
     images.push(copyImage(items[i]))
   }
 
-  console.log(images.length + " images extracted")
+  //console.log(images.length + " images extracted")
 
   // delete everything under the body
   while (document.body.firstChild) {
       document.body.firstChild.remove();
   }
 
-  // create container
+  // sets all attributes in an image
+  function setAttributes(element, attributes) {
+    for (let i = 0; i < attributes.length; i++) {
+      element.setAttribute(attributes[i].name, attributes[i].value)
+    }
+  }
+
+  // creates a toggle and label wrapped in a container for
+  // injecting a basic UI into the page
+  function makeToggle(name, attributes, listener) {
+    // make div to go around container
+    let container = document.createElement("div")
+    container.classList.add("imageExtractUI")
+    // create an id from the name
+	// remove spaces in the label name for creating the id
+    let id = name.split(' ').join('') + "ImageExtract"
+    // make the checkbox
+    let checkbox = document.createElement("input")
+    checkbox.classList.add("imageExtractCheckbox")
+    setAttributes(checkbox, [
+      {name: "type", value: "checkbox"},
+      {name: "name", value: name},
+      {name: "value", value: name},
+      {name: "id", value: id},
+    ])
+	if (attributes.checked) { checkbox.setAttribute("checked", "true") }
+    // make label
+    let label = document.createElement("label")
+    label.classList.add("imageExtractLabel")
+	setAttributes(label, [
+		{name: "for", value: id}
+	])
+    label.innerHTML = name
+    // add event listener on change
+    checkbox.addEventListener('change', listener)
+    // attatch the checkbox and label to the container
+    container.appendChild(checkbox)
+    container.appendChild(label)
+    return container
+  }
+
+  // create a checkbox to toggle centering items
+  let center = makeToggle("Center", {
+    checked : true
+    },
+    () => {
+      // toggle the center style of each image
+      forEachImage((image) => {
+      image.classList.toggle("imageExtractCenterStyle")
+      })
+    }
+  )
+
+  // create a checkbox to toggle between webpage image sizes
+  // and their actual dimensions
+  let size = makeToggle("Real size", {
+    checked : false
+    },
+    () => {
+      // flip each image between its natural size and
+      // the size it had on the webpage
+      forEachImage((image) => {
+        if (image.webpageSize) {
+          image.webpageSize = false
+          image.width = image.naturalWidth
+          image.height = image.naturalHeight
+        } else {
+          image.webpageSize = true
+          image.width = image.webpageWidth
+          image.height = image.webpageHeight
+        }
+      })
+    }
+  )
+
+  // create container for UI elements
   let container = document.createElement("div")
-  container.setAttribute("id", "imageExtractUI")
+  container.setAttribute("id", "imageExtractUIContainer")
 
-  // add small checkbox
-  let checkbox = document.createElement("input")
-  checkbox.setAttribute("type", "checkbox")
-  checkbox.setAttribute("name", "toggleDisplay")
-  checkbox.setAttribute("value", "toggleDisplay")
-  checkbox.setAttribute("id", "imageExtractToggle")
-  checkbox.setAttribute("checked", "true")
-
-  // add toggle function as event listen on change
-  checkbox.addEventListener('change', toggleCenter)
-
-  // add label
-  let label = document.createElement("label")
-  label.setAttribute("for", "imageExtractToggle")
-  label.setAttribute("id", "imageExtractToggleLabel")
-  label.innerHTML = "Center"
-
-  // add to page
+  // add UI to page
   document.body.appendChild(container)
-  container.appendChild(checkbox)
-  container.appendChild(label)
+  container.appendChild(center)
+  container.appendChild(size)
 
   // fill the body with the copied images
-  for (let i = 0; i < images.length; i++) {
-    document.body.appendChild(images[i])
-  }
+  forEachImage((image) => {
+    document.body.appendChild(image)
+  })
 
   // add message to user
   document.title = "Refresh page to return - " + document.title
 
-  // center the images
-  center()
+  // center the images by default
+  forEachImage((image) => {
+      image.classList.add("imageExtractCenterStyle")
+  })
 }
 
 run()
