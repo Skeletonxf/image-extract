@@ -14,6 +14,9 @@ function extractCurrent() {
 
 // launches the content script for the tab
 function extract(tab) {
+  browser.tabs.insertCSS(tab.id, {
+    file : "/content.css"
+  })
   browser.tabs.executeScript(tab.id, {
     file: "content_script.js"
   })

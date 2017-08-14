@@ -6,8 +6,8 @@ function run() {
   // flag to avoid running twice
   window.hasRun = true
 
-  // get all items in the body
-  let items = document.body.getElementsByTagName("*")
+  // get all images in the body
+  let items = document.body.getElementsByTagName("img")
 
   // store copies of the images in the body
   let images = []
@@ -18,26 +18,59 @@ function run() {
     image.src = old.src
     image.width = old.width
     image.height = old.height
-    // centred in the page
-    image.style.marginLeft = "auto"
-    image.style.marginRight = "auto"
-    image.style.display = "block"
     return image
   }
 
-  // walk over entire body
-  for (let i = 0; i < items.length; i++) {
-    // check if the item is an Image element
-    if (items[i] instanceof HTMLImageElement) {
-      // copy images in body
-      images.push(copyImage(items[i]))
+  function toggleCenter() {
+    for (let i = 0; i < images.length; i++) {
+      images[i].classList.toggle("imageExtractCenterStyle")
     }
   }
+
+  function center() {
+    for (let i = 0; i < images.length; i++) {
+      images[i].classList.add("imageExtractCenterStyle")
+    }
+  }
+
+  // walk over images
+  for (let i = 0; i < items.length; i++) {
+    // copy images in body
+    images.push(copyImage(items[i]))
+  }
+
+  console.log(images.length + " images extracted")
 
   // delete everything under the body
   while (document.body.firstChild) {
       document.body.firstChild.remove();
   }
+
+  // create container
+  let container = document.createElement("div")
+  container.setAttribute("id", "imageExtractUI")
+
+  // add small checkbox
+  let checkbox = document.createElement("input")
+  checkbox.setAttribute("type", "checkbox")
+  checkbox.setAttribute("name", "toggleDisplay")
+  checkbox.setAttribute("value", "toggleDisplay")
+  checkbox.setAttribute("id", "imageExtractToggle")
+  checkbox.setAttribute("checked", "true")
+
+  // add toggle function as event listen on change
+  checkbox.addEventListener('change', toggleCenter)
+
+  // add label
+  let label = document.createElement("label")
+  label.setAttribute("for", "imageExtractToggle")
+  label.setAttribute("id", "imageExtractToggleLabel")
+  label.innerHTML = "Center"
+
+  // add to page
+  document.body.appendChild(container)
+  container.appendChild(checkbox)
+  container.appendChild(label)
 
   // fill the body with the copied images
   for (let i = 0; i < images.length; i++) {
@@ -46,6 +79,9 @@ function run() {
 
   // add message to user
   document.title = "Refresh page to return - " + document.title
+
+  // center the images
+  center()
 }
 
 run()
