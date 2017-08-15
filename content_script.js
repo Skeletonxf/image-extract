@@ -59,7 +59,7 @@ function run() {
     let container = document.createElement("div")
     container.classList.add("imageExtractUI")
     // create an id from the name
-	// remove spaces in the label name for creating the id
+    // remove spaces in the label name for creating the id
     let id = name.split(' ').join('') + "ImageExtract"
     // make the checkbox
     let checkbox = document.createElement("input")
@@ -68,15 +68,15 @@ function run() {
       {name: "type", value: "checkbox"},
       {name: "name", value: name},
       {name: "value", value: name},
-      {name: "id", value: id},
+      {name: "id", value: id}
     ])
-	if (attributes.checked) { checkbox.setAttribute("checked", "true") }
+    if (attributes.checked) { checkbox.setAttribute("checked", "true") }
     // make label
     let label = document.createElement("label")
     label.classList.add("imageExtractLabel")
-	setAttributes(label, [
-		{name: "for", value: id}
-	])
+    setAttributes(label, [
+      {name: "for", value: id}
+    ])
     label.innerHTML = name
     // add event listener on change
     checkbox.addEventListener('change', listener)
