@@ -6,8 +6,8 @@ function run() {
   // flag to avoid running twice
   window.hasRun = true
 
-  // get all images in the body
-  let items = document.body.getElementsByTagName("img")
+  // get all elements in the body
+  let items = document.body.getElementsByTagName("*")
 
   // store copies of the images in the body
   let images = []
@@ -16,12 +16,20 @@ function run() {
   function copyImage(old) {
     let image = new Image()
     image.src = old.src
-    image.width = old.width
-    image.height = old.height
+    image.width = old.width || image.naturalWidth
+    image.height = old.height || image.naturalWidth
+    // use webpage image dimensions unless they are 0
+    if (image.width === 0 || image.height === 0) {
+      // set natural width on both to avoid distortion
+      image.width = image.naturalWidth
+      image.height = image.naturalWidth
+    }
     // for restoring webpage sizes
-    image.webpageWidth = old.width
-    image.webpageHeight = old.height
+    image.webpageWidth = image.width
+    image.webpageHeight = image.height
     image.webpageSize = true
+    // flag for hiding background images
+    image.isBackgroundImage = old.isBackgroundImage 
     return image
   }
 
@@ -32,13 +40,41 @@ function run() {
     }
   }
 
-  // walk over the images and copy them
+  // avoid duplicates of the same background image
+  let urls = new Set()
+
+  // walk over the items and copy the images
   for (let i = 0; i < items.length; i++) {
-    // copy images in body
-    images.push(copyImage(items[i]))
+    let element = items[i]
+    if (element instanceof HTMLImageElement) {
+      // copy images in body
+      images.push(copyImage(element))
+    }
+    let computedStyle = window.getComputedStyle(element, null)
+    if (computedStyle["backgroundImage"]) {
+      if (computedStyle["backgroundImage"].substring(0, 3) === "url") {
+        let style = computedStyle["backgroundImage"]
+        // drop off url(" and ")
+        let url = style.substring(5, style.length - 2)
+        if (!urls.has(url)) {
+          urls.add(url)
+          console.log("found background image " + url)
+          // mock the background image into an object
+          // for copyImage to work with
+          images.push(copyImage({
+            src: url,
+            width: element.width,
+            height: element.height,
+            isBackgroundImage: true
+          }))
+        } else {
+          console.log("ignored duplicate background image")
+        }
+      }
+    }
   }
 
-  //console.log(images.length + " images extracted")
+  console.log(images.length + " images extracted")
 
   // delete everything under the body
   while (document.body.firstChild) {
@@ -107,7 +143,7 @@ function run() {
       // flip each image between its natural size and
       // the size it had on the webpage
       forEachImage((image) => {
-        if (image.webpageSize) {
+        if (image.isBackgroundImage) {
           image.webpageSize = false
           image.width = image.naturalWidth
           image.height = image.naturalHeight
@@ -115,6 +151,20 @@ function run() {
           image.webpageSize = true
           image.width = image.webpageWidth
           image.height = image.webpageHeight
+        }
+      })
+    }
+  )
+
+  // create a checkbox to hide background images
+  let hide = makeToggle("Show background images", {
+    checked : false
+    },
+    () => {
+      // flip the .hideImage style
+      forEachImage((image) => {
+        if (image.isBackgroundImage) {
+          image.classList.toggle("hideImage")
         }
       })
     }
@@ -128,6 +178,7 @@ function run() {
   document.body.appendChild(container)
   container.appendChild(center)
   container.appendChild(size)
+  container.appendChild(hide)
 
   // fill the body with the copied images
   forEachImage((image) => {
@@ -137,9 +188,13 @@ function run() {
   // add message to user
   document.title = "Refresh page to return - " + document.title
 
-  // center the images by default
   forEachImage((image) => {
+      // center the images by default
       image.classList.add("imageExtractCenterStyle")
+      // hide background images by default
+      if (image.isBackgroundImage) {
+        image.classList.add("hideImage")
+      }
   })
 }
 
