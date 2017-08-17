@@ -16,8 +16,8 @@ function run() {
   function copyImage(old) {
     let image = new Image()
     image.src = old.src
-    image.width = old.width || image.naturalWidth
-    image.height = old.height || image.naturalWidth
+    image.width = old.width
+    image.height = old.height
     // use webpage image dimensions unless they are 0
     if (image.width === 0 || image.height === 0) {
       // set natural width on both to avoid distortion
@@ -58,7 +58,6 @@ function run() {
         let url = style.substring(5, style.length - 2)
         if (!urls.has(url)) {
           urls.add(url)
-          console.log("found background image " + url)
           // mock the background image into an object
           // for copyImage to work with
           images.push(copyImage({
@@ -67,14 +66,10 @@ function run() {
             height: element.height,
             isBackgroundImage: true
           }))
-        } else {
-          console.log("ignored duplicate background image")
         }
       }
     }
   }
-
-  console.log(images.length + " images extracted")
 
   // delete everything under the body
   while (document.body.firstChild) {
@@ -113,7 +108,7 @@ function run() {
     setAttributes(label, [
       {name: "for", value: id}
     ])
-    label.innerHTML = name
+    label.appendChild(document.createTextNode(name))
     // add event listener on change
     checkbox.addEventListener('change', listener)
     // attatch the checkbox and label to the container
@@ -143,7 +138,7 @@ function run() {
       // flip each image between its natural size and
       // the size it had on the webpage
       forEachImage((image) => {
-        if (image.isBackgroundImage) {
+        if (image.webpageSize) {
           image.webpageSize = false
           image.width = image.naturalWidth
           image.height = image.naturalHeight
