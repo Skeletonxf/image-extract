@@ -5,7 +5,7 @@
   "name": "Image extract",
   "version": "1.1",
 
-  "permissions": ["contextMenus", "activeTab"],
+  "permissions": ["contextMenus", "activeTab", "tabs"],
 
   "background": {
     "scripts": ["background.js"]
@@ -19,5 +19,12 @@
        "64": "icons/arrow-64.png"
     },
     "default_title": "Image extract"
+  },
+
+  "applications": {
+    "gecko": {
+      "id": "image@example.com",
+      "strict_min_version": "42.0"
+    }
   }
 }

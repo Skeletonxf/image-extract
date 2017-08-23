@@ -1,4 +1,5 @@
 function run() {
+  console.log("Running extract")
   if (window.hasRun) {
     // don't run twice
     return
