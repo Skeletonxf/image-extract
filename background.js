@@ -5,7 +5,7 @@ function logError(e) {
 }
 
 function extractCurrent() {
-  console.log("being ran, getting active tab")
+  //console.log("being ran, getting active tab")
   // get a Promise to retrieve the current tab
   var gettingActiveTab = browser.tabs.query({
     active: true, 
@@ -21,15 +21,19 @@ function extractCurrent() {
 
 // launches the content script for the tab
 function extract(tab) {
-  console.log("inserting css")
+  //console.log("inserting css")
   browser.tabs.insertCSS(tab.id, {
     file : "/content.css"
-  }).then((r) => {console.log("css ok")}, logError)
-  console.log("and running script")
+  }).then((r) => {
+    //console.log("css ok")
+  }, logError)
+  //console.log("and running script")
   browser.tabs.executeScript(tab.id, {
     file: "content_script.js"
-  }).then((r) => {console.log("js ok")}, logError)
-  console.log("finished")
+  }).then((r) => {
+    //console.log("js ok")
+  }, logError)
+  //console.log("finished")
 }
 
 // listen for clicks on the icon to run the duplicate function
@@ -56,6 +60,6 @@ if (browser.contextMenus) {
   })
 }
 
-console.log("Image extract loaded")
+//console.log("Image extract loaded")
 
-console.log("listening " + browser.browserAction.onClicked.hasListener(extractCurrent))
+//console.log("listening " + browser.browserAction.onClicked.hasListener(extractCurrent))
