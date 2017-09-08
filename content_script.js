@@ -1,3 +1,34 @@
+
+// runs the action function if the
+// setting is resolved to true, either
+// by the default being true or the
+// setting from the browser's local storage
+// being true, and runs the ifNot function
+// when not running the action function
+// if the ifNot function exists
+function doIf(setting, action, ifNot) {
+  browser.storage.local.get(setting).then((r) => {
+    // check user setting
+    let doAction = defaults[setting]
+    if (setting in r) {
+      doAction = r[setting]
+    }
+    if (doAction) {
+      action()
+    } else {
+      if (ifNot) {
+        ifNot()
+      }
+    }
+  })
+}
+
+let defaults = {
+  Center : true,
+  Realsize : false,
+  Showbackgroundimages : false
+}
+
 function run() {
   console.log("Running extract")
   if (window.hasRun) {
@@ -86,7 +117,7 @@ function run() {
 
   // creates a toggle and label wrapped in a container for
   // injecting a basic UI into the page
-  function makeToggle(name, attributes, listener) {
+  function makeToggle(name, checked, listener) {
     // make div to go around container
     let container = document.createElement("div")
     container.classList.add("imageExtractUI")
@@ -102,7 +133,9 @@ function run() {
       {name: "value", value: name},
       {name: "id", value: id}
     ])
-    if (attributes.checked) { checkbox.setAttribute("checked", "true") }
+    if (checked) {
+      checkbox.setAttribute("checked", "true")
+    }
     // make label
     let label = document.createElement("label")
     label.classList.add("imageExtractLabel")
@@ -119,9 +152,8 @@ function run() {
   }
 
   // create a checkbox to toggle centering items
-  let center = makeToggle("Center", {
-    checked : true
-    },
+  let center = makeToggle("Center",
+    true,
     () => {
       // toggle the center style of each image
       forEachImage((image) => {
@@ -130,32 +162,32 @@ function run() {
     }
   )
 
+  function toggleSize() {
+    // flip each image between its natural size and
+    // the size it had on the webpage
+    forEachImage((image) => {
+      if (image.webpageSize) {
+        image.webpageSize = false
+        image.width = image.naturalWidth
+        image.height = image.naturalHeight
+      } else {
+        image.webpageSize = true
+        image.width = image.webpageWidth
+        image.height = image.webpageHeight
+      }
+    })
+  }
+
   // create a checkbox to toggle between webpage image sizes
   // and their actual dimensions
-  let size = makeToggle("Real size", {
-    checked : false
-    },
-    () => {
-      // flip each image between its natural size and
-      // the size it had on the webpage
-      forEachImage((image) => {
-        if (image.webpageSize) {
-          image.webpageSize = false
-          image.width = image.naturalWidth
-          image.height = image.naturalHeight
-        } else {
-          image.webpageSize = true
-          image.width = image.webpageWidth
-          image.height = image.webpageHeight
-        }
-      })
-    }
+  let size = makeToggle("Real size",
+    false,
+    toggleSize
   )
 
   // create a checkbox to hide background images
-  let hide = makeToggle("Show background images", {
-    checked : false
-    },
+  let hide = makeToggle("Show background images",
+    false,
     () => {
       // flip the .hideImage style
       forEachImage((image) => {
@@ -184,13 +216,33 @@ function run() {
   // add message to user
   document.title = "Refresh page to return - " + document.title
 
-  forEachImage((image) => {
-      // center the images by default
+  // now apply user defaults
+  // these must be last because the fetching from
+  // local storage is async
+
+  doIf("Center", () => {
+    forEachImage((image) => {
+      // center the images if set as default
       image.classList.add("imageExtractCenterStyle")
+    })
+  }, () => {
+    center.firstElementChild.removeAttribute("checked")
+  })
+
+  doIf("Realsize", () => {
+    toggleSize()
+    size.firstElementChild.setAttribute("checked", "true")
+  }, null)
+
+  doIf("Showbackgroundimages", () => {
+    hide.firstElementChild.setAttribute("checked", "true")
+  }, () => {
+    forEachImage((image) => {
       // hide background images by default
       if (image.isBackgroundImage) {
         image.classList.add("hideImage")
       }
+    })
   })
 }
 

@@ -1,3 +1,5 @@
+"use strict";
+
 function logError(e) {
   console.log(`Error: ${e}`)
 }
