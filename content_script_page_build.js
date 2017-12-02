@@ -118,11 +118,10 @@ function run() {
     }
   }
 
+  console.log("sending images")
   browser.runtime.sendMessage({
     "images" : images.map(jsonify)
   }).then(null, logError)
-
-  // TODO Move below into seperate content script
 
   // delete everything under the body
   while (document.body.firstChild) {

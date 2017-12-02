@@ -4,6 +4,31 @@ function logError(e) {
   console.log(`Error: ${e}`)
 }
 
+let defaults = {
+  keyboardShortcut1Enabled : false,
+  keyboardShortcut2Enabled : false,
+  keyboardShortcut3Enabled : false,
+  extractInNewTab : false
+}
+
+// TODO put single copy in one file
+function doIf(setting, action, ifNot) {
+  browser.storage.local.get(setting).then((r) => {
+    // check user setting
+    let doAction = defaults[setting]
+    if (setting in r) {
+      doAction = r[setting]
+    }
+    if (doAction) {
+      action()
+    } else {
+      if (ifNot) {
+        ifNot()
+      }
+    }
+  })
+}
+
 function extractCurrent() {
   // get a Promise to retrieve the current tab
   var gettingActiveTab = browser.tabs.query({
@@ -28,6 +53,14 @@ function extract(tab) {
   }).then(null, logError)
 }
 
+function logImageDetails(i) {
+  console.log(i.src)
+}
+
+browser.runtime.onMessage.addListener((images) => {
+  //images.images.forEach(logImageDetails)
+})
+
 // listen for clicks on the icon to run the duplicate function
 browser.browserAction.onClicked.addListener(extractCurrent)
 
@@ -48,30 +81,6 @@ if (browser.contextMenus) {
       case contextMenuId:
       extract(tab)
       break;
-    }
-  })
-}
-
-let defaults = {
-  keyboardShortcut1Enabled : false,
-  keyboardShortcut2Enabled : false,
-  keyboardShortcut3Enabled : false
-}
-
-// TODO put single copy in one file
-function doIf(setting, action, ifNot) {
-  browser.storage.local.get(setting).then((r) => {
-    // check user setting
-    let doAction = defaults[setting]
-    if (setting in r) {
-      doAction = r[setting]
-    }
-    if (doAction) {
-      action()
-    } else {
-      if (ifNot) {
-        ifNot()
-      }
     }
   })
 }
