@@ -3,7 +3,7 @@
   "manifest_version": 2,
   "homepage_url": "https://github.com/Skeletonxf/image-extract",
   "name": "Image extract",
-  "version": "1.2",
+  "version": "1.3",
 
   "permissions": ["contextMenus", "activeTab", "storage"],
 
@@ -23,5 +23,26 @@
 
   "options_ui": {
     "page": "/settings/settings.html"
+  },
+
+  "commands": {
+    "extract-shortcut-1": {
+      "suggested_key": {
+        "default": "Ctrl+E"
+       },
+      "description": "Run image extract on current tab from keyboard shortcut (1)"
+    },
+    "extract-shortcut-2": {
+      "suggested_key": {
+        "default": "Alt+Shift+E"
+       },
+      "description": "Run image extract on current tab from keyboard shortcut (2)"
+    },
+    "extract-shortcut-3": {
+      "suggested_key": {
+        "default": "Alt+Shift+I"
+       },
+      "description": "Run image extract on current tab from keyboard shortcut (3)"
+    }
   }
 }

@@ -3,9 +3,10 @@
   <head>
     <meta charset = "utf-8">
     <link rel = "stylesheet" href = "/content.css">
+    <link rel = "stylesheet" href = "/settings/styles.css">
   </head>
   <body>
-  
+
   <h1 class = "imageExtractCenterStyle">Default settings</h1>
 
   <div id="imageExtractUIContainer">
@@ -23,8 +24,27 @@
     </div>
   </div>
 
+  <h1 class = "imageExtractCenterStyle">Launch settings</h1>
+
+  <div class = "setting">
+    <input type = "checkbox" id = "keyboardShortcut1Enabled">
+    <label for = "keyboardShortcut1Enabled">
+      Extract on CTRL+E</label>
+  </div>
+
+  <div class = "setting">
+    <input type = "checkbox" id = "keyboardShortcut2Enabled">
+    <label for = "keyboardShortcut2Enabled">
+      Extract on ALT+SHIFT+E</label>
+  </div>
+
+  <div class = "setting">
+    <input type = "checkbox" id = "keyboardShortcut3Enabled">
+    <label for = "keyboardShortcut3Enabled">
+      Extract on ALT+SHIFT+I</label>
+  </div>
+
   <script src = "/settings/settings.js"></script>
 
   </body>
 </html>
-

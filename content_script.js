@@ -1,40 +1,39 @@
-
-// runs the action function if the
-// setting is resolved to true, either
-// by the default being true or the
-// setting from the browser's local storage
-// being true, and runs the ifNot function
-// when not running the action function
-// if the ifNot function exists
-function doIf(setting, action, ifNot) {
-  browser.storage.local.get(setting).then((r) => {
-    // check user setting
-    let doAction = defaults[setting]
-    if (setting in r) {
-      doAction = r[setting]
-    }
-    if (doAction) {
-      action()
-    } else {
-      if (ifNot) {
-        ifNot()
-      }
-    }
-  })
-}
-
-let defaults = {
-  Center : true,
-  Realsize : false,
-  Showbackgroundimages : false
-}
-
 function run() {
-  //console.log("Running extract")
   if (window.hasRun) {
     // don't run twice
     return
   }
+
+  // runs the action function if the
+  // setting is resolved to true, either
+  // by the default being true or the
+  // setting from the browser's local storage
+  // being true, and runs the ifNot function
+  // when not running the action function
+  // if the ifNot function exists
+  function doIf(setting, action, ifNot) {
+    browser.storage.local.get(setting).then((r) => {
+      // check user setting
+      let doAction = defaults[setting]
+      if (setting in r) {
+        doAction = r[setting]
+      }
+      if (doAction) {
+        action()
+      } else {
+        if (ifNot) {
+          ifNot()
+        }
+      }
+    })
+  }
+
+  let defaults = {
+    Center : true,
+    Realsize : false,
+    Showbackgroundimages : false
+  }
+
   // flag to avoid running twice
   window.hasRun = true
 
@@ -61,7 +60,7 @@ function run() {
     image.webpageHeight = image.height
     image.webpageSize = true
     // flag for hiding background images
-    image.isBackgroundImage = old.isBackgroundImage 
+    image.isBackgroundImage = old.isBackgroundImage
     return image
   }
 

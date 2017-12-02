@@ -10,6 +10,12 @@ let defaults = {
   Showbackgroundimages : false
 }
 
+let launchDefaults = {
+  keyboardShortcut1Enabled : false,
+  keyboardShortcut2Enabled : false,
+  keyboardShortcut3Enabled : false
+}
+
 function restore() {
   for (let property in defaults) {
     browser.storage.local.get(property).then((r) => {
@@ -22,9 +28,10 @@ function restore() {
   }
 }
 
-function set(field) {
+function set(field, suffix) {
+  suffix = suffix || ""
   let setting = {}
-  setting[field] = document.querySelector("#" + field + "ImageExtract").checked
+  setting[field] = document.querySelector("#" + field + suffix).checked
   browser.storage.local.set(setting)
 }
 
@@ -32,7 +39,12 @@ document.addEventListener("DOMContentLoaded", restore)
 
 for (let property in defaults) {
   document.querySelector("#" + property + "ImageExtract").addEventListener("change", () => {
-    set(property)
+    set(property, "ImageExtract")
   })
 }
 
+for (let property in launchDefaults) {
+  document.querySelector("#" + property).addEventListener("change", () => {
+    set(property)
+  })
+}
