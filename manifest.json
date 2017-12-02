@@ -5,7 +5,7 @@
   "name": "Image extract",
   "version": "1.3",
 
-  "permissions": ["contextMenus", "activeTab", "storage"],
+  "permissions": ["contextMenus", "activeTab", "storage", "tabs"],
 
   "background": {
     "scripts": ["background.js"]

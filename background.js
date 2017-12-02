@@ -49,7 +49,7 @@ function extract(tab) {
     file : "/content.css"
   }).then(null, logError)
   browser.tabs.executeScript(tab.id, {
-    file: "content_script.js"
+    file: "find_images.js"
   }).then(null, logError)
 }
 
@@ -57,11 +57,21 @@ function logImageDetails(i) {
   console.log(i.src)
 }
 
-browser.runtime.onMessage.addListener((images) => {
-  //images.images.forEach(logImageDetails)
+const extractUrl = browser.extension.getURL("extracted/extracted.html");
+
+browser.runtime.onMessage.addListener((message) => {
+  //message.images.forEach(logImageDetails)
+  browser.tabs.create({"url":extractUrl}).then((tab) => {
+    console.log("created the tab " + tab.id)
+    browser.tabs.insertCSS(tab.id, {
+      file : "/content.css"
+    }).then(null, logError)
+    // TODO Insert split second half of build_page.js
+    // Hand over message image data to display in page
+  }, logError)
 })
 
-// listen for clicks on the icon to run the duplicate function
+// listen for clicks on the icon to run the extract function
 browser.browserAction.onClicked.addListener(extractCurrent)
 
 let contextMenuId = "image-extract-menu"
