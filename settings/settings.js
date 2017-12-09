@@ -26,6 +26,16 @@ function restore() {
       document.querySelector("#" + property + "ImageExtract").checked = value
     }, logError)
   }
+  // TODO Refactor
+  for (let property in launchDefaults) {
+    browser.storage.local.get(property).then((r) => {
+      let value = launchDefaults[property]
+      if (property in r) {
+        value = r[property]
+      }
+      document.querySelector("#" + property).checked = value
+    }, logError) 
+  }
 }
 
 function set(field, suffix) {
