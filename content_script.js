@@ -4,36 +4,6 @@ function run() {
     return
   }
 
-  // runs the action function if the
-  // setting is resolved to true, either
-  // by the default being true or the
-  // setting from the browser's local storage
-  // being true, and runs the ifNot function
-  // when not running the action function
-  // if the ifNot function exists
-  function doIf(setting, action, ifNot) {
-    browser.storage.local.get(setting).then((r) => {
-      // check user setting
-      let doAction = defaults[setting]
-      if (setting in r) {
-        doAction = r[setting]
-      }
-      if (doAction) {
-        action()
-      } else {
-        if (ifNot) {
-          ifNot()
-        }
-      }
-    })
-  }
-
-  let defaults = {
-    Center : true,
-    Realsize : false,
-    Showbackgroundimages : false
-  }
-
   // flag to avoid running twice
   window.hasRun = true
 
@@ -128,8 +98,6 @@ function run() {
     checkbox.classList.add("imageExtractCheckbox")
     setAttributes(checkbox, [
       {name: "type", value: "checkbox"},
-      {name: "name", value: name},
-      {name: "value", value: name},
       {name: "id", value: id}
     ])
     if (checked) {
@@ -219,7 +187,7 @@ function run() {
   // these must be last because the fetching from
   // local storage is async
 
-  doIf("Center", () => {
+  doIf("centerImages", defaults.ui, () => {
     forEachImage((image) => {
       // center the images if set as default
       image.classList.add("imageExtractCenterStyle")
@@ -228,12 +196,12 @@ function run() {
     center.firstElementChild.removeAttribute("checked")
   })
 
-  doIf("Realsize", () => {
+  doIf("realSizeImages", defaults.ui, () => {
     toggleSize()
     size.firstElementChild.setAttribute("checked", "true")
   }, null)
 
-  doIf("Showbackgroundimages", () => {
+  doIf("showBackgroundImages", defaults.ui, () => {
     hide.firstElementChild.setAttribute("checked", "true")
   }, () => {
     forEachImage((image) => {

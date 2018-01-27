@@ -11,16 +11,16 @@
 
   <div id="imageExtractUIContainer">
     <div class="imageExtractUI">
-      <input class="imageExtractCheckbox" name="Center" value="Center" id="CenterImageExtract" checked="true" type="checkbox">
-      <label class="imageExtractLabel" for="CenterImageExtract">Center</label>
+      <input class="imageExtractCheckbox" id="centerImages" checked type="checkbox">
+      <label class="imageExtractLabel" for="centerImages">Center</label>
     </div>
     <div class="imageExtractUI">
-      <input class="imageExtractCheckbox" name="Real size" value="Real size" id="RealsizeImageExtract" type="checkbox">
-      <label class="imageExtractLabel" for="RealsizeImageExtract">Real size</label>
+      <input class="imageExtractCheckbox" id="realSizeImages" type="checkbox">
+      <label class="imageExtractLabel" for="realSizeImages">Real size</label>
     </div>
     <div class="imageExtractUI">
-      <input class="imageExtractCheckbox" name="Show background images" value="Show background images" id="ShowbackgroundimagesImageExtract" type="checkbox">
-    <label class="imageExtractLabel" for="ShowbackgroundimagesImageExtract">Show background images</label>
+      <input class="imageExtractCheckbox" id="showBackgroundImages" type="checkbox">
+    <label class="imageExtractLabel" for="showBackgroundImages">Show background images</label>
     </div>
   </div>
 
@@ -44,6 +44,13 @@
       Extract on ALT+SHIFT+I</label>
   </div>
 
+  Not all shortcuts may work on all systems
+  <a href="https://github.com/Skeletonxf/duplicate-tab/issues/2">
+    Need a different shortcut?
+  </a>
+
+  <script src = "/core/util.js"></script>
+  <script src = "/settings/defaults.js"></script>
   <script src = "/settings/settings.js"></script>
 
   </body>
