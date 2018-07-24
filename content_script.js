@@ -7,11 +7,8 @@ function run() {
   // flag to avoid running twice
   window.hasRun = true
 
-  // get all elements in the body
-  let items = document.body.getElementsByTagName("*")
-
-  // store copies of the images in the body
-  let images = []
+  // get all image data from the page
+  let imageDatas = extractImages()
 
   // makes a copy of the image from the src and height/width
   function copyImage(old) {
@@ -34,183 +31,109 @@ function run() {
     return image
   }
 
-  // runs a consumer on each image
-  function forEachImage(consumer) {
-    for (let i = 0; i < images.length; i++) {
-      consumer(images[i])
-    }
-  }
-
-  // avoid duplicates of the same background image
-  let urls = new Set()
-
-  // walk over the items and copy the images
-  for (let i = 0; i < items.length; i++) {
-    let element = items[i]
-    if (element instanceof HTMLImageElement) {
-      // copy images in body
-      images.push(copyImage(element))
-    }
-    let computedStyle = window.getComputedStyle(element, null)
-    if (computedStyle["backgroundImage"]) {
-      if (computedStyle["backgroundImage"].substring(0, 3) === "url") {
-        let style = computedStyle["backgroundImage"]
-        // drop off url(" and ")
-        let url = style.substring(5, style.length - 2)
-        if (!urls.has(url)) {
-          urls.add(url)
-          // mock the background image into an object
-          // for copyImage to work with
-          images.push(copyImage({
-            src: url,
-            width: element.width,
-            height: element.height,
-            isBackgroundImage: true
-          }))
-        }
-      }
-    }
-  }
-
   // delete everything under the body
   while (document.body.firstChild) {
       document.body.firstChild.remove();
   }
 
-  // sets all attributes in an image
-  function setAttributes(element, attributes) {
-    for (let i = 0; i < attributes.length; i++) {
-      element.setAttribute(attributes[i].name, attributes[i].value)
-    }
-  }
+  // Add the UI to the page
+  let ui = buildUI()
 
-  // creates a toggle and label wrapped in a container for
-  // injecting a basic UI into the page
-  function makeToggle(name, checked, listener) {
-    // make div to go around container
-    let container = document.createElement("div")
-    container.classList.add("imageExtractUI")
-    // create an id from the name
-    // remove spaces in the label name for creating the id
-    let id = name.split(' ').join('') + "ImageExtract"
-    // make the checkbox
-    let checkbox = document.createElement("input")
-    checkbox.classList.add("imageExtractCheckbox")
-    setAttributes(checkbox, [
-      {name: "type", value: "checkbox"},
-      {name: "id", value: id}
-    ])
-    if (checked) {
-      checkbox.setAttribute("checked", "true")
-    }
-    // make label
-    let label = document.createElement("label")
-    label.classList.add("imageExtractLabel")
-    setAttributes(label, [
-      {name: "for", value: id}
-    ])
-    label.appendChild(document.createTextNode(name))
-    // add event listener on change
-    checkbox.addEventListener('change', listener)
-    // attatch the checkbox and label to the container
-    container.appendChild(checkbox)
-    container.appendChild(label)
-    return container
-  }
+  let images = []
 
-  // create a checkbox to toggle centering items
-  let center = makeToggle("Center",
-    true,
-    () => {
-      // toggle the center style of each image
-      forEachImage((image) => {
-      image.classList.toggle("imageExtractCenterStyle")
-      })
-    }
-  )
+  // fill the body with the copied images
+  imageDatas.forEach((imageData) => {
+    let image = document.createElement('img')
+    setAttributes(image, [
+      {
+        name: 'src',
+        value: imageData.url
+      },
+      {
+        name: 'width',
+        value: imageData.width
+      },
+      {
+        name: 'height',
+        value: imageData.height
+      },
+    ])
+    document.body.appendChild(image)
+    image.sizeType = 'webpage'
+    image.dataType = imageData.type
+    images.push(image)
+  })
+
+  // add message to user
+  document.title = 'Refresh page to return - ' + document.title
+
+  // Make UI elements perform changes to page
+
+  function toggleCenter() {
+    // toggle the center style of each image
+    images.forEach((image) => {
+      image.classList.toggle('imageExtractCenterStyle')
+    })
+  }
+  ui.center.checkbox.addEventListener('change', toggleCenter)
 
   function toggleSize() {
     // flip each image between its natural size and
     // the size it had on the webpage
-    forEachImage((image) => {
-      if (image.webpageSize) {
-        image.webpageSize = false
+    images.forEach((image) => {
+      if (image.sizeType === 'webpage') {
+        image.sizeType = 'naturalSize'
+        // set image size to natural size of its url
         image.width = image.naturalWidth
         image.height = image.naturalHeight
       } else {
-        image.webpageSize = true
-        image.width = image.webpageWidth
-        image.height = image.webpageHeight
+        image.sizeType = 'webpage'
+        // find will always return exactly 1 result as both
+        // arrays are the same length and contain exactly
+        // the same set of urls in their respective elements
+        image.width = imageDatas.find(i => i.url === image.src).width
+        image.height = imageDatas.find(i => i.url === image.src).height
       }
     })
   }
+  ui.size.checkbox.addEventListener('change', toggleSize)
 
-  // create a checkbox to toggle between webpage image sizes
-  // and their actual dimensions
-  let size = makeToggle("Real size",
-    false,
-    toggleSize
-  )
-
-  // create a checkbox to hide background images
-  let hide = makeToggle("Show background images",
-    false,
-    () => {
-      // flip the .hideImage style
-      forEachImage((image) => {
-        if (image.isBackgroundImage) {
-          image.classList.toggle("hideImage")
-        }
-      })
-    }
-  )
-
-  // create container for UI elements
-  let container = document.createElement("div")
-  container.setAttribute("id", "imageExtractUIContainer")
-
-  // add UI to page
-  document.body.appendChild(container)
-  container.appendChild(center)
-  container.appendChild(size)
-  container.appendChild(hide)
-
-  // fill the body with the copied images
-  forEachImage((image) => {
-    document.body.appendChild(image)
-  })
-
-  // add message to user
-  document.title = "Refresh page to return - " + document.title
+  function toggleShowBackground() {
+    // flip the .hideImage style
+    images.forEach((image) => {
+      if (image.dataType === 'background') {
+        image.classList.toggle("hideImage")
+      }
+    })
+  }
+  ui.background.checkbox.addEventListener('change', toggleShowBackground)
 
   // now apply user defaults
   // these must be last because the fetching from
   // local storage is async
 
-  doIf("centerImages", defaults.ui, () => {
-    forEachImage((image) => {
-      // center the images if set as default
-      image.classList.add("imageExtractCenterStyle")
-    })
+  doIf('centerImages', defaults.ui, () => {
+    toggleCenter()
+    ui.center.checkbox.setAttribute('checked', 'true')
   }, () => {
-    center.firstElementChild.removeAttribute("checked")
+    ui.center.checkbox.removeAttribute('checked')
   })
 
-  doIf("realSizeImages", defaults.ui, () => {
+  doIf('realSizeImages', defaults.ui, () => {
     toggleSize()
-    size.firstElementChild.setAttribute("checked", "true")
-  }, null)
-
-  doIf("showBackgroundImages", defaults.ui, () => {
-    hide.firstElementChild.setAttribute("checked", "true")
+    ui.size.checkbox.setAttribute('checked', 'true')
   }, () => {
-    forEachImage((image) => {
-      // hide background images by default
-      if (image.isBackgroundImage) {
-        image.classList.add("hideImage")
-      }
-    })
+    ui.size.checkbox.removeAttribute('checked')
   })
+
+  doIf('showBackgroundImages', defaults.ui, () => {
+    ui.background.checkbox.setAttribute('checked', 'true')
+  }, () => {
+    toggleShowBackground()
+    ui.background.checkbox.removeAttribute('checked')
+  })
+
+  console.log('done')
 }
 
 run()

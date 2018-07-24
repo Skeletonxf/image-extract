@@ -37,8 +37,20 @@ function doIf(setting, defaults, action, ifNot) {
 }
 
 /**
+ * Sets a list of attributes onto an element.
+ * @param element element to set attributes on
+ * @param attributes list of objects where name field
+ *  is attribute name and value field is value of attribute to set.
+ */
+function setAttributes(element, attributes) {
+  attributes.forEach((attribute) => {
+    element.setAttribute(attribute.name, attribute.value)
+  })
+}
+
+/**
  * Syncs the page to the values of these properties
- * 
+ *
  * @param properties properties to update to
  * @returns nothing
  */

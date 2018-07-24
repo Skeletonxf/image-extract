@@ -19,6 +19,8 @@ function extract(tab) {
   browser.tabs.insertCSS(tab.id, {
     file : "/content.css"
   }).then(null, logError)
+
+  // TODO Find a way to not indent forever
   browser.tabs.executeScript(tab.id, {
     file: "/core/util.js"
   }).then(() => {
@@ -26,8 +28,16 @@ function extract(tab) {
       file: "/settings/defaults.js"
     }).then(() => {
       browser.tabs.executeScript(tab.id, {
-        file: "content_script.js"
-      }).then(null, logError)
+        file: '/content_scripts/extract_images.js'
+      }).then(() => {
+        browser.tabs.executeScript(tab.id, {
+          file: "/content_scripts/build_ui.js"
+        }).then(() => {
+          browser.tabs.executeScript(tab.id, {
+            file: "content_script.js"
+          }).then(null, logError)
+        }, logError)
+      }, logError)
     }, logError)
   }, logError)
 }
