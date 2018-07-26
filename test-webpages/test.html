@@ -1,0 +1,11 @@
+<div id="background"></div>
+<!-- Tests for detecting urls defined by background css rule instead of backgroundImage -->
+<!-- Expected result is after checking show background images the svg can be seen -->
+<!-- TODO: Avoid hotlinking from duckduckgo for image -->
+<style>
+#background {
+  background: url(https://duckduckgo.com/assets/onboarding/robot-icon-frameless.svg);
+  width: 500px;
+  height: 500px;
+}
+</style>
