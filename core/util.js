@@ -16,7 +16,7 @@ class DevConsole {
     }
   }
 }
-const devConsole = new DevConsole(true)
+const devConsole = new DevConsole(false)
 
 /**
  * doIf executes the action if the setting
