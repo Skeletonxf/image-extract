@@ -3,8 +3,6 @@
  * found on the page.
  */
 function extractImages() {
-  console.log('extracting images')
-
   // get all elements in the body
   let elements = document.body.getElementsByTagName("*")
 
@@ -59,8 +57,8 @@ function extractImages() {
     })
   })
 
-  console.log('urls', urls)
-  console.log('images', images)
+  devConsole.log('urls', urls)
+  devConsole.log('images', images)
 
   return images
 }

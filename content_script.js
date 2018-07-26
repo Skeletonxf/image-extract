@@ -133,7 +133,7 @@ function run() {
     ui.background.checkbox.removeAttribute('checked')
   })
 
-  console.log('done')
+  devConsole.log('done')
 }
 
 run()

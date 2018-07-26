@@ -16,30 +16,44 @@ function extractCurrent() {
 
 //launches the content script for the tab
 function extract(tab) {
+  /*
+   * Result of browser.tabs.executeScript is
+   * a Promise
+   */
+  function executeScript(filepath) {
+    return browser.tabs.executeScript(tab.id, {
+      file: filepath
+    })
+  }
+
+  // CSS is not dependent on the JS injected into the page
+  // and vice versa
   browser.tabs.insertCSS(tab.id, {
     file : "/content.css"
-  }).then(null, logError)
+  }).catch(logError)
 
-  // TODO Find a way to not indent forever
-  browser.tabs.executeScript(tab.id, {
-    file: "/core/util.js"
-  }).then(() => {
-    browser.tabs.executeScript(tab.id, {
-      file: "/settings/defaults.js"
-    }).then(() => {
-      browser.tabs.executeScript(tab.id, {
-        file: '/content_scripts/extract_images.js'
-      }).then(() => {
-        browser.tabs.executeScript(tab.id, {
-          file: "/content_scripts/build_ui.js"
-        }).then(() => {
-          browser.tabs.executeScript(tab.id, {
-            file: "content_script.js"
-          }).then(null, logError)
-        }, logError)
-      }, logError)
-    }, logError)
-  }, logError)
+  // Execute JS on page sequentially so dependencies are
+  // loaded in time.
+  Promise.resolve()
+    .then(() => {
+      return executeScript('/core/util.js')
+    })
+    .then(() => {
+      return executeScript('/settings/defaults.js')
+    })
+    .then(() => {
+      // These can resolve in either order, depending only on core
+      // and defaults.
+      return Promise.all([
+        executeScript('/content_scripts/build_ui.js'),
+        executeScript('/content_scripts/extract_images.js')
+      ])
+    })
+    .then(() => {
+      // Depends on all JS prior
+      return executeScript('content_script.js')
+    })
+    .catch(logError)
 }
 
 // listen for clicks on the icon to run the duplicate function

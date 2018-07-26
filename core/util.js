@@ -6,6 +6,18 @@ function logError(e) {
   console.log(`Error: ${e}`)
 }
 
+class DevConsole {
+  constructor(isDebug) {
+    this.isDebug = isDebug
+  }
+  log(msg) {
+    if (this.isDebug) {
+      console.log(msg)
+    }
+  }
+}
+const devConsole = new DevConsole(true)
+
 /**
  * doIf executes the action if the setting
  * resolves to true, and executes the ifNot
@@ -76,5 +88,5 @@ function syncLocalStorage(property) {
   let setting = {}
   setting[property] = document.querySelector("#" + property).checked
   browser.storage.local.set(setting)
-  console.log(setting)
+  devConsole.log(setting)
 }
