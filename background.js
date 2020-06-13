@@ -1,20 +1,20 @@
-"use strict";
+import core from '/core/script.js'
+import defaults from '/settings/defaults.js'
 
-function extractCurrent() {
-  // get a Promise to retrieve the current tab
-  var gettingActiveTab = browser.tabs.query({
-    active: true,
-    currentWindow: true
-  })
-
-  // get the activate tab to extract from the Promise
-  gettingActiveTab.then((tabs) => {
-    // get the first (only) tab in the array to duplicate
-    extract(tabs[0])
-  }, logError)
+async function extractCurrent() {
+    try {
+        let tabs = await browser.tabs.query({
+          active: true,
+          currentWindow: true
+        })
+        // get the first (only) tab in the array to extract images from
+        extract(tabs[0])
+    } catch (error) {
+        core.expect("Couldn't get active tab")(error)
+    }
 }
 
-//launches the content script for the tab
+// launches the content script for the tab
 function extract(tab) {
   /*
    * Result of browser.tabs.executeScript is
@@ -30,30 +30,22 @@ function extract(tab) {
   // and vice versa
   browser.tabs.insertCSS(tab.id, {
     file : "/content.css"
-  }).catch(logError)
+  }).catch(core.expect("Couldn't insert CSS into page"))
 
-  // Execute JS on page sequentially so dependencies are
-  // loaded in time.
-  Promise.resolve()
-    .then(() => {
-      return executeScript('/core/util.js')
-    })
-    .then(() => {
-      return executeScript('/settings/defaults.js')
-    })
-    .then(() => {
-      // These can resolve in either order, depending only on core
-      // and defaults.
-      return Promise.all([
-        executeScript('/content_scripts/build_ui.js'),
-        executeScript('/content_scripts/extract_images.js')
-      ])
-    })
-    .then(() => {
-      // Depends on all JS prior
-      return executeScript('content_script.js')
-    })
-    .catch(logError)
+  async function insertJS() {
+      try {
+          // These can resolve in either order
+          await Promise.all([
+              executeScript('/content_scripts/build_ui.js'),
+              executeScript('/content_scripts/extract_images.js')
+          ])
+          // This must run after its dependencies are added to the page
+          await executeScript('/content_scripts/main.js')
+      } catch (error) {
+          core.expect("Couldn't insert JS into page")(error)
+      }
+  }
+  insertJS()
 }
 
 // listen for clicks on the icon to run the duplicate function
@@ -80,21 +72,53 @@ if (browser.contextMenus) {
   })
 }
 
+// Expose a way to query the settings from the content script, this
+// is not strictly necessary as it can be done directly from the content
+// script, but the code to automatically consider default setting values
+// is defined in /core/script.js which is used as a module and so cannot
+// be a direct dependency of the content script code as that does not run
+// as a JavaScript module. This avoids duplicating the logic.
+browser.runtime.onConnect.addListener((port) => {
+    if (port.name === 'querySettings') {
+        port.onMessage.addListener((msg) => {
+            if (msg.setting) {
+                core.settings.doIf(msg.setting, defaults[msg.settingType], () => {
+                    // respond that the setting is true
+                    port.postMessage({
+                        hasSetting: true,
+                        settingValue: true,
+                        settingType: msg.settingType,
+                        settingName: msg.setting
+                    })
+                }, () => {
+                    // respond that the setting is false
+                    port.postMessage({
+                        hasSetting: true,
+                        settingValue: false,
+                        settingType: msg.settingType,
+                        settingName: msg.setting
+                    })
+                })
+            }
+        })
+    }
+})
+
 // will be undefined on android
 if (browser.commands) {
   browser.commands.onCommand.addListener((command) => {
     if (command === "extract-shortcut-1") {
-      doIf("keyboardShortcut1Enabled", defaults.shortcuts, () => {
+      core.settings.doIf("keyboardShortcut1Enabled", defaults.shortcuts, () => {
         extractCurrent()
       })
     }
     if (command === "extract-shortcut-2") {
-      doIf("keyboardShortcut2Enabled", defaults.shortcuts, () => {
+      core.settings.doIf("keyboardShortcut2Enabled", defaults.shortcuts, () => {
         extractCurrent()
       })
     }
     if (command === "extract-shortcut-3") {
-      doIf("keyboardShortcut3Enabled", defaults.shortcuts, () => {
+      core.settings.doIf("keyboardShortcut3Enabled", defaults.shortcuts, () => {
         extractCurrent()
       })
     }

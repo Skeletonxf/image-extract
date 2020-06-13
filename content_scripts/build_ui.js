@@ -1,4 +1,16 @@
 /**
+ * Sets a list of attributes onto an element.
+ * @param element element to set attributes on
+ * @param attributes list of objects where name field
+ *  is attribute name and value field is value of attribute to set.
+ */
+function setAttributes(element, attributes) {
+  attributes.forEach((attribute) => {
+    element.setAttribute(attribute.name, attribute.value)
+  })
+}
+
+/**
  * Builds the Image Extract UI into the page to control
  * the display of the extracted images.
  * Returns an object of UI elements to be given function.

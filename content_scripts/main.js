@@ -7,8 +7,13 @@ function run() {
   // flag to avoid running twice
   window.hasRun = true
 
+  // open a port for querying the settings later
+  let port = browser.runtime.connect({
+      name: 'querySettings'
+  })
+
   // get all image data from the page
-  let imageDatas = extractImages()
+  let imageDatas = extractImages() // defined in extract_images
 
   // makes a copy of the image from the src and height/width
   function copyImage(old) {
@@ -37,14 +42,14 @@ function run() {
   }
 
   // Add the UI to the page
-  let ui = buildUI()
+  let ui = buildUI() // defined in build_ui
 
   let images = []
 
   // fill the body with the copied images
   imageDatas.forEach((imageData) => {
     let image = document.createElement('img')
-    setAttributes(image, [
+    setAttributes(image, [  // defined in build_ui
       {
         name: 'src',
         value: imageData.url
@@ -109,31 +114,39 @@ function run() {
   ui.background.checkbox.addEventListener('change', toggleShowBackground)
 
   // now apply user defaults
-  // these must be last because the fetching from
-  // local storage is async
+  // these must be last because the fetching from local storage
+  // and port communication is async
 
-  doIf('centerImages', defaults.ui, () => {
-    toggleCenter()
-    ui.center.checkbox.setAttribute('checked', 'true')
-  }, () => {
-    ui.center.checkbox.removeAttribute('checked')
+  port.onMessage.addListener((msg) => {
+      if (msg.settingName === 'centerImages') {
+          if (msg.settingValue) {
+              toggleCenter()
+              ui.center.checkbox.setAttribute('checked', 'true')
+          } else {
+              ui.center.checkbox.removeAttribute('checked')
+          }
+      }
+      if (msg.settingName === 'realSizeImages') {
+          if (msg.settingValue) {
+              toggleSize()
+              ui.size.checkbox.setAttribute('checked', 'true')
+          } else {
+              ui.size.checkbox.removeAttribute('checked')
+          }
+      }
+      if (msg.settingName === 'showBackgroundImages') {
+          if (msg.settingValue) {
+              ui.background.checkbox.setAttribute('checked', 'true')
+          } else {
+              toggleShowBackground()
+              ui.background.checkbox.removeAttribute('checked')
+          }
+      }
   })
 
-  doIf('realSizeImages', defaults.ui, () => {
-    toggleSize()
-    ui.size.checkbox.setAttribute('checked', 'true')
-  }, () => {
-    ui.size.checkbox.removeAttribute('checked')
-  })
-
-  doIf('showBackgroundImages', defaults.ui, () => {
-    ui.background.checkbox.setAttribute('checked', 'true')
-  }, () => {
-    toggleShowBackground()
-    ui.background.checkbox.removeAttribute('checked')
-  })
-
-  devConsole.log('done')
+  port.postMessage({ setting: 'centerImages', settingType: 'ui' })
+  port.postMessage({ setting: 'realSizeImages', settingType: 'ui' })
+  port.postMessage({ setting: 'showBackgroundImages', settingType: 'ui' })
 }
 
 run()

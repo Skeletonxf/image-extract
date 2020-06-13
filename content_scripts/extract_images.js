@@ -31,7 +31,7 @@ function extractImages() {
     // https://css-tricks.com/data-uris/
 
     let style = window.getComputedStyle(element)
-    ;['backgroundImage', 'background'].forEach((rule) => {
+    for (let rule of ['backgroundImage', 'background']) {
       if (style[rule]) {
         // match 'url' then '(' then as few characters as possible then ')'
         let re = /url\(.*?\)/
@@ -54,11 +54,8 @@ function extractImages() {
           })
         }
       }
-    })
+    }
   })
-
-  devConsole.log('urls', urls)
-  devConsole.log('images', images)
 
   return images
 }

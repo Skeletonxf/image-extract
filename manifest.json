@@ -8,7 +8,7 @@
   "permissions": ["contextMenus", "activeTab", "storage"],
 
   "background": {
-    "scripts": ["background.js", "/settings/defaults.js", "/core/util.js"]
+    "page": "/background/index.html"
   },
 
   "browser_action": {
