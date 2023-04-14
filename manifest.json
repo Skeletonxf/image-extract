@@ -1,17 +1,23 @@
 {
   "description": "Pulls images out of the current tab",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "homepage_url": "https://github.com/Skeletonxf/image-extract",
   "name": "Image extract",
-  "version": "1.5.1",
+  "version": "2.0",
 
-  "permissions": ["contextMenus", "activeTab", "storage"],
+  "permissions": ["contextMenus", "activeTab", "storage", "scripting"],
 
   "background": {
-    "page": "/background/index.html"
+    "page": "/background-page.html"
   },
 
-  "browser_action": {
+  "browser_specific_settings": {
+    "gecko": {
+      "strict_min_version": "112.0"
+    }
+  },
+
+  "action": {
     "browser_style": true,
     "default_icon": "icons/arrow.svg",
     "default_title": "Image extract"

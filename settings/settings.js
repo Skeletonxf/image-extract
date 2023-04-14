@@ -1,18 +1,50 @@
-import core from '/core/script.js'
-import defaults from '/settings/defaults.js'
+import settings from '/src/settings.js'
+import console from '/src/logger.js'
 
-document.addEventListener('DOMContentLoaded', () => {
-  core.settings.syncPage(defaults.ui)
-  core.settings.syncPage(defaults.shortcuts)
+/**
+ * Syncs the property checkboxes on the webpage to the default values
+ * of these properties from local storage or their default value.
+ */
+let syncPage = async (properties /* [string] */) => {
+    for (let property of properties) {
+        let value = await settings.getKeyValue(property)
+        document.querySelector("#" + property).checked = value
+    }
+}
+
+let settingKeys = [
+    'centerImages',
+    'realSizeImages',
+    'showBackgroundImages',
+    'keyboardShortcut1Enabled',
+    'keyboardShortcut2Enabled',
+    'keyboardShortcut3Enabled'
+]
+
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await syncPage(settingKeys)
+    } catch (error) {
+        console.error('Error syncing page to current setting values', error)
+    }
 })
 
-for (let property in
-    Object.assign({},
-        defaults.ui,
-        defaults.shortcuts)) {
-  document.querySelector('#' + property).addEventListener('change', () => {
-    core.settings.syncLocalStorage(property)
-  })
+/**
+ * Syncs the corresponding local storage setting
+ * to this value on the page
+ */
+let syncLocalStorage = async (property) => {
+    await settings.setKeyValue(property, document.querySelector('#' + property).checked)
+}
+
+for (let property of settingKeys) {
+    document.querySelector('#' + property).addEventListener('change', async () => {
+        try {
+            await syncLocalStorage(property)
+        } catch (error) {
+            console.error('Error syncing page to current setting values', error)
+        }
+    })
 }
 
 // will be undefined on android
