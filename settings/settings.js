@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Syncs the corresponding local storage setting
  * to this value on the page
  */
-let syncLocalStorage = async (property) => {
+let syncLocalStorage = async (property /* string */) => {
     await settings.setKeyValue(property, document.querySelector('#' + property).checked)
 }
 

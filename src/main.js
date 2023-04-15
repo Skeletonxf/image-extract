@@ -64,6 +64,7 @@ browser.runtime.onConnect.addListener((port) => {
         port.onMessage.addListener((msg) => {
             return querySettings(port, msg)
         })
+        return Promise.resolve(true)
     } else {
         return false
     }

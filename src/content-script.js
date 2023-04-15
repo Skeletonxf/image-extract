@@ -1,5 +1,3 @@
-console.log('injecting')
-
 /**
  * Sets a list of attributes onto an element.
  * @param element element to set attributes on
@@ -167,7 +165,7 @@ function run() {
 
     // open a port for querying the settings later
     let port = browser.runtime.connect({
-            name: 'querySettings'
+        name: 'querySettings'
     })
 
     // get all image data from the page
@@ -196,7 +194,7 @@ function run() {
 
     // delete everything under the body
     while (document.body.firstChild) {
-            document.body.firstChild.remove();
+        document.body.firstChild.remove();
     }
 
     // Add the UI to the page
@@ -305,5 +303,3 @@ function run() {
 }
 
 run()
-
-console.log('injected?')
