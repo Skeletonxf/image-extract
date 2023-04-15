@@ -37,35 +37,31 @@ browser.runtime.onSuspend.addListener(() => {
     console.log('Suspending')
 })
 
-let querySettings = async (port, msg) => {
+// Expose the UI settings to the content script
+let getAllUISettings = async () => {
     try {
-        if (msg.setting) {
-            let value = await settings.getKeyValue(msg.setting)
-            // respond with the setting value
-            port.postMessage({
-                hasSetting: true,
-                settingValue: value,
-                settingType: msg.settingType,
-                settingName: msg.setting
-            })
+        const { centerImages, realSizeImages, showBackgroundImages } = await settings.getMultipleKeyValues(
+            ['centerImages', 'realSizeImages', 'showBackgroundImages']
+        )
+        return {
+            uiSettings: true,
+            centerImages: centerImages,
+            realSizeImages: realSizeImages,
+            showBackgroundImages: showBackgroundImages
         }
     } catch (error) {
-        console.error('Error responding to message', error, msg)
+        console.error('Failed to get UI settings', error)
     }
     return true
 }
-
-browser.runtime.onConnect.addListener((port) => {
+browser.runtime.onMessage.addListener((data, sender) => {
     // From MDN: If you only want the listener to respond to messages of a
     // certain type, you must define the listener as a non-async function,
     // and return a Promise only for the messages the listener is meant to
     // respond to and otherwise return false or undefined:
-    if (port.name === 'querySettings') {
-        port.onMessage.addListener((msg) => {
-            return querySettings(port, msg)
-        })
-        return Promise.resolve(true)
+    if (data.getAllUISettings === true) {
+        return getAllUISettings()
     } else {
-        return false
+        return false;
     }
 })

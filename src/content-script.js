@@ -163,11 +163,6 @@ function run() {
     // flag to avoid running twice
     window.hasRun = true
 
-    // open a port for querying the settings later
-    let port = browser.runtime.connect({
-        name: 'querySettings'
-    })
-
     // get all image data from the page
     let imageDatas = extractImages()
 
@@ -269,37 +264,32 @@ function run() {
     // now apply user defaults
     // these must be last because the fetching from local storage
     // and port communication is async
-
-    port.onMessage.addListener((msg) => {
-        if (msg.settingName === 'centerImages') {
-            if (msg.settingValue) {
-                toggleCenter()
-                ui.center.checkbox.setAttribute('checked', 'true')
-            } else {
-                ui.center.checkbox.removeAttribute('checked')
+    browser.runtime.sendMessage({getAllUISettings: true})
+        .then((response) => {
+            if (response.uiSettings) {
+                if (response.centerImages) {
+                    toggleCenter()
+                    ui.center.checkbox.setAttribute('checked', 'true')
+                } else {
+                    ui.center.checkbox.removeAttribute('checked')
+                }
+                if (response.realSizeImages) {
+                    toggleSize()
+                    ui.size.checkbox.setAttribute('checked', 'true')
+                } else {
+                    ui.size.checkbox.removeAttribute('checked')
+                }
+                if (response.showBackgroundImages) {
+                    ui.background.checkbox.setAttribute('checked', 'true')
+                } else {
+                    toggleShowBackground()
+                    ui.background.checkbox.removeAttribute('checked')
+                }
             }
-        }
-        if (msg.settingName === 'realSizeImages') {
-            if (msg.settingValue) {
-                toggleSize()
-                ui.size.checkbox.setAttribute('checked', 'true')
-            } else {
-                ui.size.checkbox.removeAttribute('checked')
-            }
-        }
-        if (msg.settingName === 'showBackgroundImages') {
-            if (msg.settingValue) {
-                ui.background.checkbox.setAttribute('checked', 'true')
-            } else {
-                toggleShowBackground()
-                ui.background.checkbox.removeAttribute('checked')
-            }
-        }
-    })
-
-    port.postMessage({ setting: 'centerImages', settingType: 'ui' })
-    port.postMessage({ setting: 'realSizeImages', settingType: 'ui' })
-    port.postMessage({ setting: 'showBackgroundImages', settingType: 'ui' })
+        })
+        .catch((error) => {
+            console.error('Error getting UI settings', error)
+        })
 }
 
 run()
