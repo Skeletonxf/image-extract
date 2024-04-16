@@ -154,30 +154,6 @@ function extractImages() {
     return images
 }
 
-function extractMedia() {
-    // get all video elements in the body
-    let video = Array.from(document.body.getElementsByTagName("video"))
-
-    // get all audio elements in the body
-    let audio = Array.from(document.body.getElementsByTagName("audio"))
-
-    // FIXME: [] + [] = '' which is very wrong but that's JavaScript for you
-    // // some media may be inside iframes rather than the main document
-    // let iframes = Array.from(document.body.getElementsByTagName("iframe"))
-    // iframes.forEach((frame) => {
-    //     let frameDocument = frame.contentDocument || frame.contentWindow.document
-    //     let body = frameDocument.body
-    //     video = video + Array.from(body.getElementsByTagName("video"))
-    //     audio = audio + Array.from(body.getElementsByTagName("audio"))
-    //     // TODO: No real reason we can't recursively search a lot of nested iframes
-    // });
-
-    return {
-        "video": video,
-        "audio": audio,
-    }
-}
-
 function run() {
     if (window.hasRun) {
         // don't run twice
@@ -189,8 +165,6 @@ function run() {
 
     // get all image data from the page
     let imageDatas = extractImages()
-
-    const { videoData, audioData } = extractMedia()
 
     // makes a copy of the image from the src and height/width
     function copyImage(old) {
@@ -243,15 +217,6 @@ function run() {
         image.dataType = imageData.type
         imageData.image = image
     })
-
-    // TODO: Styling, reformatting, want each element added here to use browser
-    // controls even if original webpage didn't
-    // videoData.forEach((videoElement) => {
-    //     document.body.appendChild(videoElement)
-    // });
-    // audioData.forEach((audioElement) => {
-    //     document.body.appendChild(audioElement)
-    // });
 
     // add message to user
     document.title = 'Refresh page to return - ' + document.title
