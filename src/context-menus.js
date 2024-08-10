@@ -2,19 +2,28 @@ const contextMenuId = 'image-extract-menu'
 
 export default class ContextMenus {
     registerContextMenu(listener /* (Tab) -> () */) {
-        this.#registerContextMenu(contextMenuId, listener)
+        // will be undefined on android
+        if (browser.menus) {
+            this.#registerContextMenu(contextMenuId, listener)
+        }
     }
 
     addContextMenu(listener /* (Tab) -> () */) {
-        this.#addContextMenu(contextMenuId, 'Extract Images', listener)
+        // will be undefined on android
+        if (browser.menus) {
+            this.#addContextMenu(contextMenuId, 'Extract Images', listener)
+        }
     }
 
     removeContextMenu(listener /* (Tab) -> () */) {
-        this.#removeContextMenu(contextMenuId, listener)
+        // will be undefined on android
+        if (browser.menus) {
+            this.#removeContextMenu(contextMenuId, listener)
+        }
     }
 
     #registerContextMenu(id, listener) {
-        browser.contextMenus.onClicked.addListener((info, tab) => {
+        browser.menus.onClicked.addListener((info, tab) => {
             if (info.menuItemId === id) {
                 listener(tab)
             }
@@ -22,7 +31,7 @@ export default class ContextMenus {
     }
 
     #addContextMenu(id, title, listener) {
-        browser.contextMenus.create({
+        browser.menus.create({
             id: id,
             title: title,
             contexts: [ 'tab' ]
@@ -30,6 +39,6 @@ export default class ContextMenus {
     }
 
     #removeContextMenu(id, listener) {
-        browser.contextMenus.remove(id)
+        browser.menus.remove(id)
     }
 }

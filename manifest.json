@@ -5,7 +5,7 @@
   "name": "Image extract",
   "version": "2.0",
 
-  "permissions": ["contextMenus", "activeTab", "storage", "scripting"],
+  "permissions": ["menus", "activeTab", "storage", "scripting"],
 
   "background": {
     "page": "/background-page.html"
@@ -19,7 +19,6 @@
   },
 
   "action": {
-    "browser_style": true,
     "default_icon": "icons/arrow.svg",
     "default_title": "Image extract"
   },

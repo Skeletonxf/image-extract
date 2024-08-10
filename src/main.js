@@ -17,11 +17,8 @@ contextMenus.registerContextMenu(extractTab)
 shortcuts.registerKeyboardShortcuts(extractTab)
 
 function refreshContextMenus() {
-    // will be undefined on android
-    if (browser.contextMenus) {
-        // add a right click extract menu to tabs
-        contextMenus.addContextMenu(extractTab)
-    }
+    // add a right click extract menu to tabs
+    contextMenus.addContextMenu(extractTab)
 }
 
 browser.runtime.onInstalled.addListener(() => {
