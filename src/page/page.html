@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/src/page/styles.css">
+    <!-- TODO: Don't have a PNG version here, can we use SVG instead? -->
+    <link rel="shortcut icon" type= "image/png" href="/icons/arrow-32.png"/>
+    <script type="module" src="/src/page/main.js"></script>
+    <title>Image Extract</title>
+  </head>
+  <body>
+    <h1 id="header">
+        <div id="header-content">
+            <div id="imageExtractUIContainer">
+                <p>Extracted Images:</p>
+                <div class="imageExtractUI">
+                    <input class="imageExtractCheckbox" type="checkbox" id="CenterImageExtract" checked="true">
+                    <label class="imageExtractLabel" for="CenterImageExtract">Center</label>
+                </div>
+                <div class="imageExtractUI">
+                    <input class="imageExtractCheckbox" type="checkbox" id="RealsizeImageExtract">
+                    <label class="imageExtractLabel" for="RealsizeImageExtract">Real size</label>
+                </div>
+                <div class="imageExtractUI">
+                    <input class="imageExtractCheckbox" type="checkbox" id="ShowbackgroundimagesImageExtract">
+                    <label class="imageExtractLabel" for="ShowbackgroundimagesImageExtract">Show background images</label>
+                </div>
+            </div>
+        </div>
+    </h1>
+    <div id="list">
+    </div>
+  </body>
+</html>
