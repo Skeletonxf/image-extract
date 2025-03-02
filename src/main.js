@@ -35,9 +35,13 @@ browser.runtime.onSuspend.addListener(() => {
 })
 
 let receiveImages = async (images) => {
-    console.log('Images: ', images)
-    // TODO: Open images in new tab with UI we used to apply to the current tab
+    await imageExtract.receiveImages(images)
     return { extracting: true }
+}
+
+let requestImages = async (tabID) => {
+    let images = imageExtract.retrieveImages(tabID)
+    return { images: images }
 }
 
 // Expose the UI settings to the content script
@@ -67,6 +71,8 @@ browser.runtime.onMessage.addListener((data, sender) => {
         return getAllUISettings()
     } else if (data.receiveImages === true) {
         return receiveImages(data.images)
+    } else if (data.requestImages === true) {
+        return requestImages(data.tabID)
     } else {
         return { uiSettings: false }
     }

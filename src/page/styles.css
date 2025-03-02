@@ -1,8 +1,24 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+  font-size: large;
+  margin: 0;
+  padding: 5px;
+}
+
 /* centers images in the middle of the page */
 .imageExtractCenterStyle {
   margin-left: auto;
   margin-right: auto;
   display: block;
+}
+
+#header-content {
+  background-color: lightyellow;
+  text-align: center;
 }
 
 /* full page navigation */
