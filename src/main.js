@@ -51,13 +51,14 @@ let getAllUISettings = async () => {
     }
     return { uiSettings: false }
 }
-browser.runtime.onMessage.addListener(async (data, sender) => {
+
+browser.runtime.onMessage.addListener((data, sender) => {
     // From MDN: If you only want the listener to respond to messages of a
     // certain type, you must define the listener as a non-async function,
     // and return a Promise only for the messages the listener is meant to
     // respond to and otherwise return false or undefined:
     if (data.getAllUISettings === true) {
-        return await getAllUISettings()
+        return getAllUISettings()
     } else {
         return { uiSettings: false }
     }
