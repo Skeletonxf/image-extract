@@ -34,16 +34,6 @@ browser.runtime.onSuspend.addListener(() => {
     console.log('Suspending')
 })
 
-let receiveImages = async (images) => {
-    await imageExtract.receiveImages(images)
-    return { extracting: true }
-}
-
-let requestImages = async (tabID) => {
-    let images = imageExtract.retrieveImages(tabID)
-    return { images: images }
-}
-
 // Expose the UI settings to the content script
 let getAllUISettings = async () => {
     try {
@@ -61,18 +51,13 @@ let getAllUISettings = async () => {
     }
     return { uiSettings: false }
 }
-
-browser.runtime.onMessage.addListener((data, sender) => {
+browser.runtime.onMessage.addListener(async (data, sender) => {
     // From MDN: If you only want the listener to respond to messages of a
     // certain type, you must define the listener as a non-async function,
     // and return a Promise only for the messages the listener is meant to
     // respond to and otherwise return false or undefined:
     if (data.getAllUISettings === true) {
-        return getAllUISettings()
-    } else if (data.receiveImages === true) {
-        return receiveImages(data.images)
-    } else if (data.requestImages === true) {
-        return requestImages(data.tabID)
+        return await getAllUISettings()
     } else {
         return { uiSettings: false }
     }
