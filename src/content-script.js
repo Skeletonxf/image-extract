@@ -154,18 +154,11 @@ function extractImages() {
     return images
 }
 
-function run() {
-    if (window.hasRun) {
-        // don't run twice
-        return
-    }
-
+function run(imageDatas /* [ImageData] */) {
     // flag to avoid running twice
     window.hasRun = true
 
-    // get all image data from the page
-    let imageDatas = extractImages()
-
+    // FIXME: This looks unused now?
     // makes a copy of the image from the src and height/width
     function copyImage(old) {
         let image = new Image()
@@ -292,4 +285,19 @@ function run() {
         })
 }
 
-run()
+function check() {
+    if (window.hasRun) {
+        // don't run twice
+        return
+    }
+
+    // get all image data from the page
+    let imageDatas = extractImages()
+
+    if (window.confirm(`Run Image Extract and replace this tab's content with its ${imageDatas.length} images?`)) {
+        run(imageDatas)
+    }
+}
+
+// TODO: Add back in check for DOMContentLoaded here?
+check()
