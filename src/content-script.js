@@ -80,15 +80,39 @@ function buildUI() {
 
     // add UI to page
     document.body.appendChild(container)
-    container.appendChild(center.container)
-    container.appendChild(size.container)
-    container.appendChild(background.container)
+    let firstRow = document.createElement("div")
+    setAttributes(firstRow, [
+        {
+            name: 'id',
+            value: 'imageExtractUIRow1'
+        }
+    ])
+    let secondRow = document.createElement("div")
+    setAttributes(secondRow, [
+        {
+            name: 'id',
+            value: 'imageExtractUIRow2'
+        }
+    ])
+    container.appendChild(firstRow)
+
+    firstRow.appendChild(center.container)
+    firstRow.appendChild(size.container)
+    firstRow.appendChild(background.container)
+
+    let confirm = makeToggle('Confirm before running', false)
+    let info = document.createElement("p")
+    info.textContent = "If set to confirm, Image Extract will display a confirmation dialog before running, allowing you to cancel if you didn't mean to. This can help prevent you from accidentally losing your tabs, but it adds an extra step."
+    container.appendChild(info)
+    container.appendChild(secondRow)
+    secondRow.appendChild(confirm.container)
 
     // return checkboxes for applying logic on click to
     return {
         center: center,
         size: size,
-        background: background
+        background: background,
+        confirm: confirm
     }
 }
 

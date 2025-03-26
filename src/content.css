@@ -17,10 +17,31 @@ body {
   margin: 0 !important;
   padding: 0 !important;
   display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  position: relative !important;
+}
+
+#imageExtractUIRow1, #imageExtractUIRow2 {
+  width: 100% !important;
+  background-color: lightyellow !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
   flex-direction: row !important;
   justify-content: center !important;
   flex-wrap: wrap !important;
   position: relative !important;
+}
+
+p {
+    font-size: small !important;
+    font-style: normal !important;
+    color: black !important;
+    text-align: center !important;
+    margin: 4px !important;
+    padding: 0 !important;
 }
 
 /* each toggle + label container */

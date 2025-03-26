@@ -11,17 +11,26 @@
   <h1 class = "imageExtractCenterStyle">Default settings</h1>
 
   <div id="imageExtractUIContainer">
-    <div class="imageExtractUI">
-      <input class="imageExtractCheckbox" id="centerImages" checked type="checkbox">
-      <label class="imageExtractLabel" for="centerImages">Center</label>
+    <div id="imageExtractUIRow1">
+      <div class="imageExtractUI">
+        <input class="imageExtractCheckbox" type="checkbox" id="CenterImageExtract" checked="true">
+        <label class="imageExtractLabel" for="CenterImageExtract">Center</label>
+      </div>
+      <div class="imageExtractUI">
+        <input class="imageExtractCheckbox" type="checkbox" id="RealsizeImageExtract">
+        <label class="imageExtractLabel" for="RealsizeImageExtract">Real size</label>
+      </div>
+      <div class="imageExtractUI">
+        <input class="imageExtractCheckbox" type="checkbox" id="ShowbackgroundimagesImageExtract">
+        <label class="imageExtractLabel" for="ShowbackgroundimagesImageExtract">Show background images</label>
+      </div>
     </div>
-    <div class="imageExtractUI">
-      <input class="imageExtractCheckbox" id="realSizeImages" type="checkbox">
-      <label class="imageExtractLabel" for="realSizeImages">Real size</label>
-    </div>
-    <div class="imageExtractUI">
-      <input class="imageExtractCheckbox" id="showBackgroundImages" type="checkbox">
-    <label class="imageExtractLabel" for="showBackgroundImages">Show background images</label>
+    <p>If set to confirm, Image Extract will display a confirmation dialog before running, allowing you to cancel if you didn't mean to. This can help prevent you from accidentally losing your tabs, but it adds an extra step.</p>
+    <div id="imageExtractUIRow2">
+      <div class="imageExtractUI">
+        <input class="imageExtractCheckbox" type="checkbox" id="ConfirmbeforerunningImageExtract">
+        <label class="imageExtractLabel" for="ConfirmbeforerunningImageExtract">Confirm before running</label>
+      </div>
     </div>
   </div>
 
