@@ -16,6 +16,7 @@ let settingKeys = [
     'centerImages',
     'realSizeImages',
     'showBackgroundImages',
+    'confirmBeforeRunningImageExtract',
     'keyboardShortcut1Enabled',
     'keyboardShortcut2Enabled',
     'keyboardShortcut3Enabled'

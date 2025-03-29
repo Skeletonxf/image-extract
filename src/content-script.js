@@ -18,13 +18,12 @@ function setAttributes(element, attributes) {
 function buildUI() {
     // creates a toggle and label wrapped in a container for
     // injecting a basic UI into the page
-    function makeToggle(name, checked) {
+    function makeToggle(name, checked, settingKey) {
         // make div to go around container
         let container = document.createElement("div")
         container.classList.add("imageExtractUI")
-        // create an id from the name
-        // remove spaces in the label name for creating the id
-        let id = name.split(' ').join('') + "ImageExtract"
+        // create an id from the setting key
+        let id = settingKey + "ImageExtract"
         // make the checkbox
         let checkbox = document.createElement("input")
         checkbox.classList.add("imageExtractCheckbox")
@@ -61,13 +60,13 @@ function buildUI() {
     }
 
     // create a checkbox to toggle centering items
-    let center = makeToggle('Center', true)
+    let center = makeToggle('Center', true, 'centerImages')
 
     // create a checkbox to toggle image sizes
-    let size = makeToggle('Real size', false)
+    let size = makeToggle('Real size', false, 'realSizeImages')
 
     // create a checkbox to hide background images
-    let background = makeToggle('Show background images', false)
+    let background = makeToggle('Show background images', false, 'showBackgroundImages')
 
     // create container for UI elements
     let container = document.createElement("div")
@@ -100,7 +99,7 @@ function buildUI() {
     firstRow.appendChild(size.container)
     firstRow.appendChild(background.container)
 
-    let confirm = makeToggle('Confirm before running', false)
+    let confirm = makeToggle('Confirm before running', false, 'confirmBeforeRunningImageExtract')
     let info = document.createElement("p")
     info.textContent = "If set to confirm, Image Extract will display a confirmation dialog before running, allowing you to cancel if you didn't mean to. This can help prevent you from accidentally losing your tabs, but it adds an extra step."
     container.appendChild(info)
@@ -178,7 +177,7 @@ function extractImages() {
     return images
 }
 
-function run(imageDatas /* [ImageData] */) {
+function run(imageDatas /* [ImageData] */, uiSettings) {
     // flag to avoid running twice
     window.hasRun = true
 
@@ -278,35 +277,29 @@ function run(imageDatas /* [ImageData] */) {
     }
     ui.background.checkbox.addEventListener('change', toggleShowBackground)
 
-    // now apply user defaults
-    // these must be last because the fetching from local storage
-    // and port communication is async
-    browser.runtime.sendMessage({getAllUISettings: true})
-        .then((response) => {
-            if (response.uiSettings) {
-                if (response.centerImages) {
-                    toggleCenter()
-                    ui.center.checkbox.setAttribute('checked', 'true')
-                } else {
-                    ui.center.checkbox.removeAttribute('checked')
-                }
-                if (response.realSizeImages) {
-                    toggleSize()
-                    ui.size.checkbox.setAttribute('checked', 'true')
-                } else {
-                    ui.size.checkbox.removeAttribute('checked')
-                }
-                if (response.showBackgroundImages) {
-                    ui.background.checkbox.setAttribute('checked', 'true')
-                } else {
-                    toggleShowBackground()
-                    ui.background.checkbox.removeAttribute('checked')
-                }
-            }
-        })
-        .catch((error) => {
-            console.error('Error getting UI settings', error)
-        })
+    if (uiSettings.centerImages) {
+        toggleCenter()
+        ui.center.checkbox.setAttribute('checked', 'true')
+    } else {
+        ui.center.checkbox.removeAttribute('checked')
+    }
+    if (uiSettings.realSizeImages) {
+        toggleSize()
+        ui.size.checkbox.setAttribute('checked', 'true')
+    } else {
+        ui.size.checkbox.removeAttribute('checked')
+    }
+    if (uiSettings.showBackgroundImages) {
+        ui.background.checkbox.setAttribute('checked', 'true')
+    } else {
+        toggleShowBackground()
+        ui.background.checkbox.removeAttribute('checked')
+    }
+    if (uiSettings.confirmBeforeRunningImageExtract) {
+        ui.confirm.checkbox.setAttribute('checked', 'true')
+    } else {
+        ui.confirm.checkbox.removeAttribute('checked')
+    }
 }
 
 function check() {
@@ -315,12 +308,27 @@ function check() {
         return
     }
 
+    let fetchingSettings = browser.runtime.sendMessage({getAllUISettings: true})
+
     // get all image data from the page
     let imageDatas = extractImages()
 
-    if (window.confirm(`Run Image Extract and replace this tab's content with its ${imageDatas.length} images?`)) {
-        run(imageDatas)
-    }
+    fetchingSettings.then((response) => {
+        if (response.uiSettings) {
+            if (response.confirmBeforeRunningImageExtract) {
+                if (window.confirm(`Run Image Extract and replace this tab's content with its ${imageDatas.length} images?`)) {
+                    run(imageDatas, response)
+                }
+            } else {
+                run(imageDatas, response)
+            }
+        } else {
+            console.error('No UI settings returned in response', response)
+        }
+    })
+    .catch((error) => {
+        console.error('Error getting UI settings', error)
+    })
 }
 
 // TODO: Add back in check for DOMContentLoaded here?

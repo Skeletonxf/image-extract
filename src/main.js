@@ -37,14 +37,25 @@ browser.runtime.onSuspend.addListener(() => {
 // Expose the UI settings to the content script
 let getAllUISettings = async () => {
     try {
-        const { centerImages, realSizeImages, showBackgroundImages } = await settings.getMultipleKeyValues(
-            ['centerImages', 'realSizeImages', 'showBackgroundImages']
+        const {
+            centerImages,
+            realSizeImages,
+            showBackgroundImages,
+            confirmBeforeRunningImageExtract
+        } = await settings.getMultipleKeyValues(
+            [
+                'centerImages',
+                'realSizeImages',
+                'showBackgroundImages',
+                'confirmBeforeRunningImageExtract'
+            ]
         )
         return {
             uiSettings: true,
             centerImages: centerImages,
             realSizeImages: realSizeImages,
-            showBackgroundImages: showBackgroundImages
+            showBackgroundImages: showBackgroundImages,
+            confirmBeforeRunningImageExtract: confirmBeforeRunningImageExtract,
         }
     } catch (error) {
         console.error('Failed to get UI settings', error)
