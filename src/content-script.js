@@ -1,3 +1,16 @@
+const idSuffix = "ImageExtract"
+const settingKeys = [
+    'centerImages',
+    'realSizeImages',
+    'showBackgroundImages',
+    'confirmBeforeRunningImageExtract'
+]
+
+let idToSettingKeys = {}
+for (const key of settingKeys) {
+    idToSettingKeys[key + idSuffix] = key
+}
+
 /**
  * Sets a list of attributes onto an element.
  * @param element element to set attributes on
@@ -23,7 +36,7 @@ function buildUI() {
         let container = document.createElement("div")
         container.classList.add("imageExtractUI")
         // create an id from the setting key
-        let id = settingKey + "ImageExtract"
+        let id = settingKey + idSuffix
         // make the checkbox
         let checkbox = document.createElement("input")
         checkbox.classList.add("imageExtractCheckbox")
@@ -177,31 +190,9 @@ function extractImages() {
     return images
 }
 
-function run(imageDatas /* [ImageData] */, uiSettings) {
+function run(imageDatas /* [ImageData] */, uiSettings, onUpdateSettings) {
     // flag to avoid running twice
     window.hasRun = true
-
-    // FIXME: This looks unused now?
-    // makes a copy of the image from the src and height/width
-    function copyImage(old) {
-        let image = new Image()
-        image.src = old.src
-        image.width = old.width
-        image.height = old.height
-        // use webpage image dimensions unless they are 0
-        if (image.width === 0 || image.height === 0) {
-            // set natural width on both to avoid distortion
-            image.width = image.naturalWidth
-            image.height = image.naturalWidth
-        }
-        // for restoring webpage sizes
-        image.webpageWidth = image.width
-        image.webpageHeight = image.height
-        image.webpageSize = true
-        // flag for hiding background images
-        image.isBackgroundImage = old.isBackgroundImage
-        return image
-    }
 
     // delete everything under the body
     while (document.body.firstChild) {
@@ -244,6 +235,11 @@ function run(imageDatas /* [ImageData] */, uiSettings) {
         imageDatas.forEach((imageData) => {
             imageData.image.classList.toggle('imageExtractCenterStyle')
         })
+        let enabled = ui.center.checkbox.checked
+        let id = idToSettingKeys[ui.center.checkbox.id]
+        let update = {}
+        update[id] = enabled
+        onUpdateSettings(update)
     }
     ui.center.checkbox.addEventListener('change', toggleCenter)
 
@@ -263,6 +259,11 @@ function run(imageDatas /* [ImageData] */, uiSettings) {
                 image.height = imageData.height
             }
         })
+        let enabled = ui.size.checkbox.checked
+        let id = idToSettingKeys[ui.size.checkbox.id]
+        let update = {}
+        update[id] = enabled
+        onUpdateSettings(update)
     }
     ui.size.checkbox.addEventListener('change', toggleSize)
 
@@ -274,8 +275,22 @@ function run(imageDatas /* [ImageData] */, uiSettings) {
                 image.classList.toggle("hideImage")
             }
         })
+        let enabled = ui.background.checkbox.checked
+        let id = idToSettingKeys[ui.background.checkbox.id]
+        let update = {}
+        update[id] = enabled
+        onUpdateSettings(update)
     }
     ui.background.checkbox.addEventListener('change', toggleShowBackground)
+
+    function toggleConfirm() {
+        let enabled = ui.confirm.checkbox.checked
+        let id = idToSettingKeys[ui.confirm.checkbox.id]
+        let update = {}
+        update[id] = enabled
+        onUpdateSettings(update)
+    }
+    ui.confirm.checkbox.addEventListener('change', toggleConfirm)
 
     if (uiSettings.centerImages) {
         toggleCenter()
@@ -313,14 +328,18 @@ function check() {
     // get all image data from the page
     let imageDatas = extractImages()
 
+    let onUpdateSettings = (update) => {
+        console.log(update)
+    }
+
     fetchingSettings.then((response) => {
         if (response.uiSettings) {
             if (response.confirmBeforeRunningImageExtract) {
                 if (window.confirm(`Run Image Extract and replace this tab's content with its ${imageDatas.length} images?`)) {
-                    run(imageDatas, response)
+                    run(imageDatas, response, onUpdateSettings)
                 }
             } else {
-                run(imageDatas, response)
+                run(imageDatas, response, onUpdateSettings)
             }
         } else {
             console.error('No UI settings returned in response', response)
