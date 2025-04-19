@@ -63,6 +63,33 @@ let getAllUISettings = async () => {
     return { uiSettings: false }
 }
 
+let updateUISettings = async (update) => {
+    try {
+        const {
+            centerImages,
+            realSizeImages,
+            showBackgroundImages,
+            confirmBeforeRunningImageExtract
+        } = update
+        if (centerImages !== undefined) {
+            await settings.setKeyValue('centerImages', centerImages)
+        }
+        if (realSizeImages !== undefined) {
+            await settings.setKeyValue('realSizeImages', realSizeImages)
+        }
+        if (showBackgroundImages !== undefined) {
+            await settings.setKeyValue('showBackgroundImages', showBackgroundImages)
+        }
+        if (confirmBeforeRunningImageExtract !== undefined) {
+            await settings.setKeyValue('confirmBeforeRunningImageExtract', confirmBeforeRunningImageExtract)
+        }
+        return { updated: true }
+    } catch (error) {
+        console.error('Failed to update UI settings', error, update)
+    }
+    return { updated: false }
+}
+
 browser.runtime.onMessage.addListener((data, sender) => {
     // From MDN: If you only want the listener to respond to messages of a
     // certain type, you must define the listener as a non-async function,
@@ -70,6 +97,8 @@ browser.runtime.onMessage.addListener((data, sender) => {
     // respond to and otherwise return false or undefined:
     if (data.getAllUISettings === true) {
         return getAllUISettings()
+    } else if (data.updateUISettings === true) {
+        return updateUISettings(data.update)
     } else {
         return { uiSettings: false }
     }

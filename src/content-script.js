@@ -328,8 +328,13 @@ function check() {
     // get all image data from the page
     let imageDatas = extractImages()
 
-    let onUpdateSettings = (update) => {
-        console.log(update)
+    let onUpdateSettings = async (update) => {
+        let result = browser.runtime.sendMessage(
+            {
+                updateUISettings: true,
+                update: update,
+            }
+        )
     }
 
     fetchingSettings.then((response) => {
