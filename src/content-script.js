@@ -243,7 +243,27 @@ function run(imageDatas /* [ImageData] */, uiSettings, onUpdateSettings) {
     }
     ui.center.checkbox.addEventListener('change', toggleCenter)
 
-    function toggleSize() {
+    function toggleSizeForImage(image, backoff /* number: remaining tries */) {
+        if (
+            image.sizeType === 'naturalSize' &&
+            (image.width === 0 || image.height === 0)
+        ) {
+            if (!(image.naturalWidth === 0 || image.naturalHeight === 0)) {
+                image.width = image.naturalWidth
+                image.height = image.naturalHeight
+            } else {
+                if (backoff >= 0) {
+                    // wait a little longer in case we're checking natural size
+                    // too early
+                    (async() => {
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        toggleSizeForImage(image, backoff - 1)
+                    })()
+                }
+            }
+        }
+    }
+    function toggleSize(backoff /* boolean */) {
         // flip each image between its natural size and
         // the size it had on the webpage
         imageDatas.forEach((imageData) => {
@@ -258,6 +278,17 @@ function run(imageDatas /* [ImageData] */, uiSettings, onUpdateSettings) {
                 image.width = imageData.width
                 image.height = imageData.height
             }
+            if (
+                backoff &&
+                image.sizeType === 'naturalSize' &&
+                (image.naturalWidth === 0 || image.naturalHeight === 0)
+            ) {
+                // natural size may sometimes be 0 due to checking too early
+                (async() => {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    toggleSizeForImage(image, 5)
+                })()
+            }
         })
         let enabled = ui.size.checkbox.checked
         let id = idToSettingKeys[ui.size.checkbox.id]
@@ -265,7 +296,14 @@ function run(imageDatas /* [ImageData] */, uiSettings, onUpdateSettings) {
         update[id] = enabled
         onUpdateSettings(update)
     }
-    ui.size.checkbox.addEventListener('change', toggleSize)
+    function toggleSizeWithBackoff() {
+        toggleSize(true)
+    }
+    function toggleSizeWithNoBackoff() {
+        toggleSize(false)
+    }
+
+    ui.size.checkbox.addEventListener('change', toggleSizeWithNoBackoff)
 
     function toggleShowBackground() {
         // flip the .hideImage style
@@ -299,7 +337,7 @@ function run(imageDatas /* [ImageData] */, uiSettings, onUpdateSettings) {
         ui.center.checkbox.removeAttribute('checked')
     }
     if (uiSettings.realSizeImages) {
-        toggleSize()
+        toggleSizeWithBackoff()
         ui.size.checkbox.setAttribute('checked', 'true')
     } else {
         ui.size.checkbox.removeAttribute('checked')
@@ -355,5 +393,4 @@ function check() {
     })
 }
 
-// TODO: Add back in check for DOMContentLoaded here?
 check()
