@@ -4,7 +4,7 @@ import console from '/src/logger.js'
 export default class ImageExtract {
     async extractImages(tab /* Tab */) {
         try {
-            let js = await browser.scripting.executeScript({
+            let js = browser.scripting.executeScript({
                 target: {
                     tabId: tab.id,
                 },

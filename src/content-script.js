@@ -1,3 +1,7 @@
+// Wrap everything in a self executing function without a name to avoid
+// conflicts when this script is injected into a page additional times
+(function() {
+
 const idSuffix = "ImageExtract"
 const settingKeys = [
     'centerImages',
@@ -394,3 +398,5 @@ function check() {
 }
 
 check()
+
+})()
