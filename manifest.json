@@ -3,7 +3,7 @@
   "manifest_version": 3,
   "homepage_url": "https://github.com/Skeletonxf/image-extract",
   "name": "Image extract",
-  "version": "2.2",
+  "version": "2.3",
 
   "permissions": ["menus", "activeTab", "storage", "scripting"],
 
