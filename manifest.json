@@ -1,50 +1,40 @@
 {
-  "description": "Pulls images out of the current tab",
   "manifest_version": 3,
-  "homepage_url": "https://github.com/Skeletonxf/image-extract",
-  "name": "Image extract",
-  "version": "2.3",
-
-  "permissions": ["menus", "activeTab", "storage", "scripting"],
-
-  "background": {
-    "page": "/background-page.html"
-  },
-
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "{6381b0dc-8bef-47d0-8c31-6fffbdd8ec7f}",
-      "strict_min_version": "129.0"
-    }
-  },
-
+  "name": "Image Extract",
+  "version": "1.1.0",
+  "description": "Extracts all images from the current tab and shows them in a new tab",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
   "action": {
-    "default_icon": "icons/arrow.svg",
-    "default_title": "Image extract"
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    },
+    "default_title": "Extract Images"
   },
-
-  "options_ui": {
-    "page": "/settings/settings.html"
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
   },
-
+  "background": {
+    "service_worker": "background.js"
+  },
   "commands": {
-    "extract-shortcut-1": {
-      "suggested_key": {
-        "default": "Ctrl+E"
-       },
-      "description": "Run image extract on current tab from keyboard shortcut (1)"
-    },
-    "extract-shortcut-2": {
-      "suggested_key": {
-        "default": "Alt+Shift+E"
-       },
-      "description": "Run image extract on current tab from keyboard shortcut (2)"
-    },
-    "extract-shortcut-3": {
+    "_execute_action": {
       "suggested_key": {
         "default": "Alt+Shift+I"
-       },
-      "description": "Run image extract on current tab from keyboard shortcut (3)"
+      },
+      "description": "Extract images from current tab"
     }
-  }
+  },
+  "web_accessible_resources": [{
+    "resources": ["viewer.html", "viewer.js"],
+    "matches": ["<all_urls>"]
+  }]
 }
