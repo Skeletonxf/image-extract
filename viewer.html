@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extracted Images</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    .header {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #333;
+    }
+
+    .header h1 {
+      margin: 0 0 10px 0;
+      font-size: 1.5em;
+      font-weight: 500;
+    }
+
+    .header .source {
+      font-size: 0.9em;
+      color: #888;
+      word-break: break-all;
+    }
+
+    .header .source a {
+      color: #6ba3ff;
+      text-decoration: none;
+    }
+
+    .header .source a:hover {
+      text-decoration: underline;
+    }
+
+    .stats {
+      margin-bottom: 20px;
+      padding: 10px 15px;
+      background: #252525;
+      border-radius: 6px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .stats span {
+      color: #aaa;
+    }
+
+    .stats strong {
+      color: #fff;
+    }
+
+    .controls {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .controls input[type="text"] {
+      padding: 8px 12px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background: #252525;
+      color: #e0e0e0;
+      font-size: 14px;
+      min-width: 200px;
+    }
+
+    .controls input[type="text"]:focus {
+      outline: none;
+      border-color: #6ba3ff;
+    }
+
+    .controls select {
+      padding: 8px 12px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background: #252525;
+      color: #e0e0e0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .image-card {
+      background: #252525;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .image-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    .image-container {
+      position: relative;
+      width: 100%;
+      padding-top: 100%;
+      background: #1a1a1a;
+      overflow: hidden;
+    }
+
+    .image-container img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    .image-container img.error {
+      opacity: 0.3;
+    }
+
+    .image-info {
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    .image-info .filename {
+      color: #e0e0e0;
+      word-break: break-all;
+      margin-bottom: 6px;
+      max-height: 40px;
+      overflow: hidden;
+    }
+
+    .image-info .meta {
+      color: #888;
+      font-size: 11px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .image-info .meta-separator {
+      color: #555;
+    }
+
+    .image-info .meta-resolution {
+      color: #9ecfff;
+    }
+
+    .image-info .meta-format {
+      color: #a8e6a3;
+    }
+
+    .image-info .meta-size {
+      color: #f0c674;
+    }
+
+    .image-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .image-actions button {
+      flex: 1;
+      padding: 6px 10px;
+      background: #333;
+      color: #e0e0e0;
+      border: none;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .image-actions button:hover {
+      background: #444;
+    }
+
+    .image-actions .btn-download {
+      background: #2d5a3d;
+    }
+
+    .image-actions .btn-download:hover {
+      background: #3d7a4d;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #888;
+    }
+
+    .no-images {
+      text-align: center;
+      padding: 60px;
+      color: #888;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Extracted Images</h1>
+    <div class="source">Loading...</div>
+  </div>
+  
+  <div class="stats">
+    <span>Found: <strong id="total-count">0</strong> images</span>
+    <span>Showing: <strong id="visible-count">0</strong></span>
+  </div>
+
+  <div class="controls">
+    <input type="text" id="filter" placeholder="Filter by URL...">
+    <select id="sort">
+      <option value="default">Original order</option>
+      <option value="name">Sort by filename</option>
+    </select>
+  </div>
+
+  <div class="loading" id="loading">Extracting images...</div>
+  <div class="no-images hidden" id="no-images">No images found on this page.</div>
+  <div class="grid" id="grid"></div>
+
+  <script src="viewer.js"></script>
+</body>
+</html>
