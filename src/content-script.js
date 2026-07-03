@@ -370,6 +370,11 @@ function check() {
     // get all image data from the page
     let imageDatas = extractImages()
 
+    // Block any other JavaScript already applied on this webpage that would capture
+    // context menu events from running, so the browser context menu can display
+    // as per normal to save images.
+    document.addEventListener('contextmenu', (e) => e.stopPropagation(), true)
+
     let onUpdateSettings = async (update) => {
         let result = browser.runtime.sendMessage(
             {
