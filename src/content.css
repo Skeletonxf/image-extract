@@ -3,6 +3,13 @@ body {
   padding: 0 !important;
 }
 
+img {
+  pointer-events: auto !important;
+  user-select: auto !important;
+  -moz-user-select: auto !important;
+  touch-action: auto !important;
+}
+
 /* centers images in the middle of the page */
 .imageExtractCenterStyle {
   margin-left: auto !important;
