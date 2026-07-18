@@ -30,7 +30,7 @@ img {
   position: relative !important;
 }
 
-#imageExtractUIRow1, #imageExtractUIRow2 {
+#imageExtractUIRow1, #imageExtractUIRow2, #imageExtractUIRow3 {
   width: 100% !important;
   background-color: lightyellow !important;
   margin: 0 !important;
@@ -40,6 +40,34 @@ img {
   justify-content: center !important;
   flex-wrap: wrap !important;
   position: relative !important;
+}
+
+#imageExtractUIRow3 {
+  margin-top: 8px !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+button {
+  background-color: goldenrod !important;
+  border: 1px solid black !important;
+  transition: background-color 0.25s !important;
+  border-radius: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+button:hover:enabled, button:focus:enabled {
+  background-color: palegoldenrod !important;
+}
+
+button:disabled {
+  background-color: palegoldenrod !important;
+  opacity: 0.6 !important;
+}
+
+.antiHijackingDescription {
+  margin-top: 0 !important;
 }
 
 p {

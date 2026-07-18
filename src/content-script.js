@@ -123,12 +123,27 @@ function buildUI() {
     container.appendChild(secondRow)
     secondRow.appendChild(confirm.container)
 
+    let antiHijackingButton = document.createElement('button')
+    let antiHijackingLabel = document.createElement('p')
+    antiHijackingLabel.textContent = 'Block additional click hijacking methods'
+    antiHijackingButton.appendChild(antiHijackingLabel)
+    antiHijackingButton.classList.add('imageExtractButton')
+    let antiHijackingContainer = document.createElement('div')
+    setAttributes(antiHijackingContainer, [{ name: 'id', value: 'imageExtractUIRow3' }])
+    antiHijackingContainer.appendChild(antiHijackingButton)
+    let antiHijackingDescription = document.createElement('p')
+    antiHijackingDescription.classList.add('antiHijackingDescription')
+    antiHijackingDescription.textContent = 'Applies additional anti click hijacking methods. These methods may interfere with normal browser menus, particularly the long press menu on Android. However on some sites that try to block context menus this can remedy not being able to select an image at all.'
+    antiHijackingContainer.appendChild(antiHijackingDescription)
+    container.appendChild(antiHijackingContainer)
+
     // return checkboxes for applying logic on click to
     return {
         center: center,
         size: size,
         background: background,
-        confirm: confirm
+        confirm: confirm,
+        antiHijackingButton: antiHijackingButton
     }
 }
 
@@ -357,6 +372,28 @@ function run(imageDatas /* [ImageData] */, uiSettings, onUpdateSettings) {
     } else {
         ui.confirm.checkbox.removeAttribute('checked')
     }
+
+    ui.antiHijackingButton.addEventListener('click', () => {
+        for (const eventName of [
+            'contextmenu',
+            'touchstart',
+            'touchend',
+            'touchmove',
+            'touchcancel',
+            'pointerover',
+            'pointerenter',
+            'pointerdown',
+            'mouseover',
+            'mouseenter',
+            'mousemove',
+            'pointercancel',
+            'pointerout',
+            'pointerleave'
+        ]) {
+            document.addEventListener(eventName, (e) => e.stopPropagation(), true)
+        }
+        ui.antiHijackingButton.disabled = true
+    })
 }
 
 function check() {
@@ -373,7 +410,22 @@ function check() {
     // Block any other JavaScript already applied on this webpage that would capture
     // context menu events from running, so the browser context menu can display
     // as per normal to save images.
-    document.addEventListener('contextmenu', (e) => e.stopPropagation(), true)
+    document.addEventListener(
+        'contextmenu',
+        (event) => {
+            // On mobile in particular, long press events to bring up browser menus
+            // with touch pointerTypes can also be blocked if we stop propagation, so only
+            // block mouse events to prevent sites hijacking right click menus. This
+            // unfortunately leaves some sites on Android with right click menus still
+            // blocked, so we added a button on our UI for more stringent anti hijacking
+            // measures, but we don't apply them by default as they would interfere with
+            // the browser UI on all sites.
+            if (event.pointerType === "mouse") {
+                event.stopPropagation()
+            }
+        },
+        true
+    )
 
     let onUpdateSettings = async (update) => {
         let result = browser.runtime.sendMessage(
