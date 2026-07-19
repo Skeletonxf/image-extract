@@ -96,6 +96,7 @@ function buildUI() {
 
     // add UI to page
     document.body.appendChild(container)
+    document.body.classList.add('imageExtract')
     let firstRow = document.createElement("div")
     setAttributes(firstRow, [
         {

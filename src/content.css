@@ -1,9 +1,9 @@
-body {
+body.imageExtract {
   margin: 0 !important;
   padding: 0 !important;
 }
 
-img {
+.imageExtract img {
   pointer-events: auto !important;
   user-select: auto !important;
   -moz-user-select: auto !important;
@@ -48,7 +48,7 @@ img {
   align-items: center !important;
 }
 
-button {
+.imageExtract button {
   background-color: goldenrod !important;
   border: 1px solid black !important;
   transition: background-color 0.25s !important;
@@ -57,11 +57,11 @@ button {
   padding: 0 !important;
 }
 
-button:hover:enabled, button:focus:enabled {
+.imageExtract button:hover:enabled, .imageExtract button:focus:enabled {
   background-color: palegoldenrod !important;
 }
 
-button:disabled {
+.imageExtract button:disabled {
   background-color: palegoldenrod !important;
   opacity: 0.6 !important;
 }
@@ -70,7 +70,7 @@ button:disabled {
   margin-top: 0 !important;
 }
 
-p {
+.imageExtract p {
     font-size: small !important;
     font-style: normal !important;
     color: black !important;
