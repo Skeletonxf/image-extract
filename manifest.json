@@ -3,7 +3,7 @@
   "manifest_version": 3,
   "homepage_url": "https://github.com/Skeletonxf/image-extract",
   "name": "Image extract",
-  "version": "2.4.3",
+  "version": "2.4.4",
 
   "permissions": ["menus", "activeTab", "storage", "scripting"],
 
@@ -14,7 +14,10 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "{6381b0dc-8bef-47d0-8c31-6fffbdd8ec7f}",
-      "strict_min_version": "129.0"
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   },
 
